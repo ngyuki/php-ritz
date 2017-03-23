@@ -6,31 +6,18 @@ use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Zend\Stratigility\MiddlewarePipe;
-use Zend\Diactoros\Response\TextResponse;
-use ngyuki\Ritz\View\ViewModel;
-use DI\Container;
-use Invoker\Invoker;
-use Invoker\ParameterResolver\AssociativeArrayResolver;
-use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
-use Invoker\ParameterResolver\ResolverChain;
-use Invoker\ParameterResolver\TypeHintResolver;
+use ngyuki\Ritz\Dispatcher\ActionInvoker;
 
 class DispatchMiddleware implements MiddlewareInterface
 {
     /**
-     * @var Invoker
+     * @var ActionInvoker
      */
     private $invoker;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ActionInvoker $invoker)
     {
-        if ($container instanceof Container) {
-            $this->invoker = new Invoker(new ResolverChain([
-                new TypeHintResolver(),
-                new TypeHintContainerResolver($container),
-                new AssociativeArrayResolver(),
-            ]));
-        }
+        $this->invoker = $invoker;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
@@ -53,28 +40,7 @@ class DispatchMiddleware implements MiddlewareInterface
         }
 
         $action = function (ServerRequestInterface $request, DelegateInterface $delegate) use ($instance, $method) {
-
-            if ($this->invoker) {
-
-                $parameters = [
-                        ServerRequestInterface::class => $request,
-                        DelegateInterface::class => $delegate,
-                    ] + $request->getAttributes();
-
-                $response = $this->invoker->call([$instance, $method], $parameters);
-
-            } else {
-                $response = $instance->$method($request, $delegate);
-            }
-
-            if (is_array($response)) {
-                return new ViewModel($response);
-            }
-
-            if (is_string($response)) {
-                return new TextResponse($response);
-            }
-
+            $response = $this->invoker->invoke($request, $delegate, $instance, $method);
             return $response;
         };
 
