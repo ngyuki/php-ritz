@@ -38,6 +38,9 @@ class RouteMiddleware implements MiddlewareInterface
         $method = $request->getMethod();
         $uri = $request->getUri()->getPath();
 
+        /* @var $request ServerRequestInterface */
+        $request = $request->withAttribute(RouteResult::class, new RouteResult(null, null));
+
         list ($route, $params) = $this->router->route($method, $uri);
 
         if ($route === null) {
@@ -52,15 +55,11 @@ class RouteMiddleware implements MiddlewareInterface
 
         $instance = $this->container->get($class);
 
-        ///
-
         foreach ($params as $name => $value) {
             $request = $request->withAttribute($name, $value);
         }
 
-        /* @var $request ServerRequestInterface */
-        $request = $request->withAttribute(Attribute::ACTION_METHOD, $method);
-        $request = $request->withAttribute(Attribute::INSTANCE, $instance);
+        $request = $request->withAttribute(RouteResult::class, new RouteResult($instance, $method));
 
         $response = $delegate->process($request);
 

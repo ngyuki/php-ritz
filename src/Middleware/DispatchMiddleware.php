@@ -35,8 +35,8 @@ class DispatchMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        $instance = $request->getAttribute(Attribute::INSTANCE);
-        $method = $request->getAttribute(Attribute::ACTION_METHOD);
+        $instance = RouteResult::from($request)->getInstance();
+        $method = RouteResult::from($request)->getMethod();
 
         if ($instance === null) {
             return $delegate->process($request);

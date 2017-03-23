@@ -8,10 +8,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Stratigility\MiddlewarePipe;
 
-use ngyuki\Ritz\Middleware\Attribute;
 use ngyuki\Ritz\Middleware\DispatchMiddleware;
 use ngyuki\Ritz\Middleware\RenderMiddleware;
 use ngyuki\Ritz\Middleware\RouteMiddleware;
+use ngyuki\Ritz\Middleware\RouteResult;
 use ngyuki\Ritz\View\ViewModel;
 
 use App\Component\Identity;
@@ -54,7 +54,7 @@ class Application implements MiddlewareInterface
 
     public function checkLogin(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        if ($request->getAttribute(Attribute::INSTANCE) instanceof LoginController) {
+        if (RouteResult::from($request)->getInstance() instanceof LoginController) {
             return $delegate->process($request);
         }
 
