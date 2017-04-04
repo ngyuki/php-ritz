@@ -1,12 +1,23 @@
 <?php
 namespace App;
 
-use ngyuki\Ritz\Bootstrap as BaseBootstrap;
+use ngyuki\Ritz\Bootstrap\Configure;
+use ngyuki\Ritz\Bootstrap\ContainerFactory;
+use ngyuki\Ritz\Bootstrap\Server;
 
-class Bootstrap extends BaseBootstrap
+class Bootstrap
 {
-    public function __construct()
+    public static function init()
     {
-        $this->init(glob(__DIR__ . '/../boot/*.php'));
+        $config = (new Configure())->init(glob(__DIR__ . '/../boot/*.php'));
+        $container = (new ContainerFactory())->create($config);
+        return $container;
+    }
+
+    public static function main()
+    {
+        $container = self::init();
+        $server = new Server();
+        $server->run($container->get(Application::class), $container->get('debug'));
     }
 }

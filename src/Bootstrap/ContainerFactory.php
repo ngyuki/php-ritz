@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz;
+namespace ngyuki\Ritz\Bootstrap;
 
 use Psr\Container\ContainerInterface;
 
@@ -15,6 +15,10 @@ use function DI\get;
 
 class ContainerFactory
 {
+    /**
+     * @param array $definitions
+     * @return \DI\Container
+     */
     public function create(array $definitions)
     {
         $definitions += [

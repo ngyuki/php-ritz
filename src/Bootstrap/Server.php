@@ -1,55 +1,60 @@
 <?php
-namespace ngyuki\Ritz;
+namespace ngyuki\Ritz\Bootstrap;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 
+use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\TextResponse;
-use Zend\Diactoros\Server;
-use Zend\Diactoros\ServerRequestFactory;
+use Zend\Diactoros\Response\SapiEmitter;
+
+use Zend\Stratigility\Delegate\CallableDelegateDecorator;
 use Zend\Stratigility\MiddlewarePipe;
-use Zend\Stratigility\NoopFinalHandler;
 use Zend\Stratigility\Middleware\NotFoundHandler;
 
-class Bootstrap
+class Server
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function init(array $bootFiles)
-    {
-        $definitions = [];
-
-        foreach ($bootFiles as $fn) {
-            /** @noinspection PhpIncludeInspection */
-            $definitions = (require $fn) + $definitions;
-        }
-
-        $this->container = (new ContainerFactory())->create($definitions);
-    }
-
-    public function run($app)
+    public function run(MiddlewareInterface $app, $debug)
     {
         $pipeline = new MiddlewarePipe();
 
-        if ($this->container->get('debug')) {
+        if ($debug) {
             $pipeline->pipe($this->dumpOutputMiddleware());
             $pipeline->pipe($this->debugErrorHandlerMiddleware());
-
         } else {
             $pipeline->pipe($this->errorHandlerMiddleware());
         }
 
-        $pipeline->pipe($this->container->get($app));
-        $pipeline->pipe(new NotFoundHandler(new Response()));
+        $pipeline->pipe($app);
 
-        $server = Server::createServerFromRequest($pipeline, ServerRequestFactory::fromGlobals());
-        $server->listen(new NoopFinalHandler());
+        $request = ServerRequestFactory::fromGlobals();
+
+        ob_start();
+        $level = ob_get_level();
+
+        $response = $this->handle($pipeline, $request);
+
+        $emitter = new SapiEmitter();
+        $emitter->emit($response, $level);
+    }
+
+    /**
+     * @param MiddlewareInterface $app
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(MiddlewareInterface $app, ServerRequestInterface $request)
+    {
+        return $app->process($request, new CallableDelegateDecorator(
+            function (ServerRequestInterface $request, ResponseInterface $response) {
+                return (new NotFoundHandler($response))($request, $response, function () {});
+            },
+            new Response()
+        ));
     }
 
     /**
