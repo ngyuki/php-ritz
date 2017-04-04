@@ -14,7 +14,7 @@ use ngyuki\Ritz\Middleware\RouteMiddleware;
 use ngyuki\Ritz\Middleware\RouteResult;
 use ngyuki\Ritz\View\ViewModel;
 
-use App\Component\Identity;
+use App\Component\IdentityInterface;
 use App\Controller\LoginController;
 
 class Application implements MiddlewareInterface
@@ -25,11 +25,11 @@ class Application implements MiddlewareInterface
     private $container;
 
     /**
-     * @var Identity
+     * @var IdentityInterface
      */
     private $identity;
 
-    public function __construct(ContainerInterface $container, Identity $identity)
+    public function __construct(ContainerInterface $container, IdentityInterface $identity)
     {
         $this->container = $container;
         $this->identity = $identity;

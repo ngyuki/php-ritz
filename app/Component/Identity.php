@@ -1,7 +1,7 @@
 <?php
 namespace App\Component;
 
-class Identity
+class Identity implements IdentityInterface
 {
     private $session;
 

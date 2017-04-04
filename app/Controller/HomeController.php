@@ -6,7 +6,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use ngyuki\Ritz\View\ViewModel;
-use App\Component\Identity;
+use App\Component\IdentityInterface;
 use App\Component\Session;
 use App\Service\HelloService;
 
@@ -25,7 +25,7 @@ class HomeController implements MiddlewareInterface
         return $response;
     }
 
-    public function indexAction(Identity $identity, Session $session, HelloService $hello)
+    public function indexAction(IdentityInterface $identity, Session $session, HelloService $hello)
     {
         $val = $session['val'] = $session['val'] + 1;
 

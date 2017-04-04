@@ -4,7 +4,7 @@ namespace App\Controller;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use ngyuki\Ritz\View\ViewModel;
-use App\Component\Identity;
+use App\Component\IdentityInterface;
 use App\Service\LoginService;
 
 class LoginController
@@ -14,7 +14,7 @@ class LoginController
         return [];
     }
 
-    public function loginAction(ServerRequestInterface $request, LoginService $loginService, Identity $identity)
+    public function loginAction(ServerRequestInterface $request, LoginService $loginService, IdentityInterface $identity)
     {
         $values = $request->getParsedBody();
         $username = $values['username'];
@@ -33,7 +33,7 @@ class LoginController
         ]);
     }
 
-    public function logoutAction(Identity $identity)
+    public function logoutAction(IdentityInterface $identity)
     {
         $identity->clear();
 
