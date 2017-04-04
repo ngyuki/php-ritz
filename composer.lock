@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4227b800d296b06be17fa8ecf1bded96",
-    "content-hash": "8f5409b87c0a64b29d51913099383496",
+    "hash": "22b8f119f2c7e05986ce56a4a5e0774e",
+    "content-hash": "1618ef2f497151d3008f03b4c5b0ba28",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -248,26 +248,28 @@
         },
         {
             "name": "php-di/php-di",
-            "version": "5.4.0",
+            "version": "5.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-DI/PHP-DI.git",
-                "reference": "e348393488fa909e4bc0707ba5c9c44cd602a1cb"
+                "reference": "8ecded470bb0255c93f2996f78bb3b644c06599a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-DI/PHP-DI/zipball/e348393488fa909e4bc0707ba5c9c44cd602a1cb",
-                "reference": "e348393488fa909e4bc0707ba5c9c44cd602a1cb",
+                "url": "https://api.github.com/repos/PHP-DI/PHP-DI/zipball/8ecded470bb0255c93f2996f78bb3b644c06599a",
+                "reference": "8ecded470bb0255c93f2996f78bb3b644c06599a",
                 "shasum": ""
             },
             "require": {
-                "container-interop/container-interop": "~1.0",
+                "container-interop/container-interop": "~1.2",
                 "php": ">=5.5.0",
                 "php-di/invoker": "^1.3.2",
-                "php-di/phpdoc-reader": "^2.0.1"
+                "php-di/phpdoc-reader": "^2.0.1",
+                "psr/container": "~1.0"
             },
             "provide": {
-                "container-interop/container-interop-implementation": "^1.0"
+                "container-interop/container-interop-implementation": "^1.0",
+                "psr/container-implementation": "^1.0"
             },
             "replace": {
                 "mnapoli/php-di": "*"
@@ -304,7 +306,7 @@
                 "dependency injection",
                 "di"
             ],
-            "time": "2016-08-23 20:18:00"
+            "time": "2017-04-11 19:42:20"
         },
         {
             "name": "php-di/phpdoc-reader",
@@ -444,16 +446,16 @@
         },
         {
             "name": "zendframework/zend-diactoros",
-            "version": "1.3.10",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "83e8d98b9915de76c659ce27d683c02a0f99fa90"
+                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/83e8d98b9915de76c659ce27d683c02a0f99fa90",
-                "reference": "83e8d98b9915de76c659ce27d683c02a0f99fa90",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/b03f285a333f51e58c95cce54109a4a9ed691436",
+                "reference": "b03f285a333f51e58c95cce54109a4a9ed691436",
                 "shasum": ""
             },
             "require": {
@@ -461,17 +463,19 @@
                 "psr/http-message": "~1.0"
             },
             "provide": {
-                "psr/http-message-implementation": "~1.0.0"
+                "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
                 "phpunit/phpunit": "^4.6 || ^5.5",
                 "zendframework/zend-coding-standard": "~1.0.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev",
-                    "dev-develop": "1.4-dev"
+                    "dev-master": "1.4-dev",
+                    "dev-develop": "1.5-dev"
                 }
             },
             "autoload": {
@@ -490,7 +494,7 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2017-01-23 04:53:24"
+            "time": "2017-04-06 16:18:34"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -535,6 +539,107 @@
                 "zf2"
             ],
             "time": "2016-06-30 19:48:38"
+        },
+        {
+            "name": "zendframework/zend-stratigility",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-stratigility.git",
+                "reference": "229e7d94010d09d9e68096ff6f1d35f354d8dac9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-stratigility/zipball/229e7d94010d09d9e68096ff6f1d35f354d8dac9",
+                "reference": "229e7d94010d09d9e68096ff6f1d35f354d8dac9",
+                "shasum": ""
+            },
+            "require": {
+                "http-interop/http-middleware": "^0.4.1",
+                "php": "^5.6 || ^7.0",
+                "psr/http-message": "^1.0",
+                "zendframework/zend-escaper": "^2.3"
+            },
+            "require-dev": {
+                "malukenho/docheader": "^0.1.5",
+                "phpunit/phpunit": "^5.7",
+                "zendframework/zend-coding-standard": "~1.0.0",
+                "zendframework/zend-diactoros": "^1.0"
+            },
+            "suggest": {
+                "psr/http-message-implementation": "Please install a psr/http-message-implementation to consume Stratigility; e.g., zendframework/zend-diactoros"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.0-dev",
+                    "dev-develop": "2.1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Stratigility\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Middleware for PHP",
+            "homepage": "https://github.com/zendframework/zend-stratigility",
+            "keywords": [
+                "http",
+                "middleware",
+                "psr-7"
+            ],
+            "time": "2017-01-25 19:16:16"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "zendframework/zend-dom",
+            "version": "2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-dom.git",
+                "reference": "a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-dom/zipball/a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e",
+                "reference": "a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "1.7.*",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev",
+                    "dev-develop": "2.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Dom\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "provides tools for working with DOM documents and structures",
+            "homepage": "https://github.com/zendframework/zend-dom",
+            "keywords": [
+                "dom",
+                "zf2"
+            ],
+            "time": "2015-10-14 03:37:48"
         },
         {
             "name": "zendframework/zend-eventmanager",
@@ -700,63 +805,8 @@
                 "zf2"
             ],
             "time": "2016-09-13 14:38:50"
-        },
-        {
-            "name": "zendframework/zend-stratigility",
-            "version": "2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-stratigility.git",
-                "reference": "229e7d94010d09d9e68096ff6f1d35f354d8dac9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stratigility/zipball/229e7d94010d09d9e68096ff6f1d35f354d8dac9",
-                "reference": "229e7d94010d09d9e68096ff6f1d35f354d8dac9",
-                "shasum": ""
-            },
-            "require": {
-                "http-interop/http-middleware": "^0.4.1",
-                "php": "^5.6 || ^7.0",
-                "psr/http-message": "^1.0",
-                "zendframework/zend-escaper": "^2.3"
-            },
-            "require-dev": {
-                "malukenho/docheader": "^0.1.5",
-                "phpunit/phpunit": "^5.7",
-                "zendframework/zend-coding-standard": "~1.0.0",
-                "zendframework/zend-diactoros": "^1.0"
-            },
-            "suggest": {
-                "psr/http-message-implementation": "Please install a psr/http-message-implementation to consume Stratigility; e.g., zendframework/zend-diactoros"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.0-dev",
-                    "dev-develop": "2.1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Stratigility\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Middleware for PHP",
-            "homepage": "https://github.com/zendframework/zend-stratigility",
-            "keywords": [
-                "http",
-                "middleware",
-                "psr-7"
-            ],
-            "time": "2017-01-25 19:16:16"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
