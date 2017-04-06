@@ -76,7 +76,11 @@ class Application implements MiddlewareInterface
         try {
             return $delegate->process($request);
         } catch (\Exception $ex) {
-            return (new ViewModel())->withTemplate('Error/error')->withVariable('exception', $ex);
+            $debug = $this->container->get('debug');
+            return (new ViewModel())->withTemplate('Error/error')
+                ->withVariable('exception', $ex)
+                ->withVariable('debug', $debug)
+            ;
         }
     }
 }

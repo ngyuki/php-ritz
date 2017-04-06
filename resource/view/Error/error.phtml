@@ -1,3 +1,7 @@
 <?php $this->layout('Layout/no-login') ?>
 
+<p>Internal server error</p>
+
+<?php if ($debug): ?>
 <pre><?=$this->h((string)$exception) ?></pre>
+<?php endif; ?>
