@@ -9,7 +9,15 @@ class Bootstrap
 {
     public static function init()
     {
-        $config = (new Configure())->init(glob(__DIR__ . '/../boot/*.php'));
+        $env = getenv('APP_ENV');
+
+        $files = array_merge(
+            glob(__DIR__ . '/../boot/*.php'),
+            glob(__DIR__ . "/../config/$env.php"),
+            glob(__DIR__ . '/../config/local.php')
+        );
+
+        $config = (new Configure())->init($files);
         $container = (new ContainerFactory())->create($config);
         return $container;
     }

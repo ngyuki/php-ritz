@@ -13,7 +13,7 @@ class Configure
 
         foreach ($bootFiles as $fn) {
             /** @noinspection PhpIncludeInspection */
-            $config = (require $fn) + $config;
+            $config = (array)(require $fn) + $config;
         }
 
         return $config;
