@@ -11,7 +11,7 @@ use Zend\Stratigility\MiddlewarePipe;
 use ngyuki\Ritz\Middleware\DispatchMiddleware;
 use ngyuki\Ritz\Middleware\RenderMiddleware;
 use ngyuki\Ritz\Middleware\RouteMiddleware;
-use ngyuki\Ritz\Middleware\RouteResult;
+use ngyuki\Ritz\Router\RouteResult;
 use ngyuki\Ritz\View\ViewModel;
 
 use App\Component\IdentityInterface;

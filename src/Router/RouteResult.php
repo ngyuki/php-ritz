@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Middleware;
+namespace ngyuki\Ritz\Router;
 
 use Psr\Http\Message\ServerRequestInterface;
 

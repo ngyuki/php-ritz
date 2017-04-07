@@ -7,6 +7,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use ngyuki\Ritz\Router\Resolver;
 use ngyuki\Ritz\Router\Router;
+use ngyuki\Ritz\Router\RouteResult;
 use ngyuki\Ritz\View\ViewModel;
 
 class RouteMiddleware implements MiddlewareInterface

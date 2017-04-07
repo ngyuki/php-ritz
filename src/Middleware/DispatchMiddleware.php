@@ -7,6 +7,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Zend\Stratigility\MiddlewarePipe;
 use ngyuki\Ritz\Dispatcher\ActionInvoker;
+use ngyuki\Ritz\Router\RouteResult;
 
 class DispatchMiddleware implements MiddlewareInterface
 {
