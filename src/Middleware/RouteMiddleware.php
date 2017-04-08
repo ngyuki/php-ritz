@@ -1,7 +1,6 @@
 <?php
 namespace ngyuki\Ritz\Middleware;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
@@ -13,11 +12,6 @@ use ngyuki\Ritz\View\ViewModel;
 class RouteMiddleware implements MiddlewareInterface
 {
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * @var Router
      */
     private $router;
@@ -27,9 +21,8 @@ class RouteMiddleware implements MiddlewareInterface
      */
     private $resolver;
 
-    public function __construct(ContainerInterface $container, Router $router, Resolver $resolver)
+    public function __construct(Router $router, Resolver $resolver)
     {
-        $this->container = $container;
         $this->router = $router;
         $this->resolver = $resolver;
     }
@@ -39,34 +32,26 @@ class RouteMiddleware implements MiddlewareInterface
         $method = $request->getMethod();
         $uri = $request->getUri()->getPath();
 
-        /* @var $request ServerRequestInterface */
-        $request = $request->withAttribute(RouteResult::class, new RouteResult(null, null));
-
         list ($route, $params) = $this->router->route($method, $uri);
 
         if ($route === null) {
+            $request = $request->withAttribute(RouteResult::class, new RouteResult(null, null, null));
             return $delegate->process($request);
         }
-
-        list ($class, $method, $template) = $this->resolver->resolve($route);
-
-        if ($class === null) {
-            return $delegate->process($request);
-        }
-
-        $instance = $this->container->get($class);
 
         foreach ($params as $name => $value) {
             $request = $request->withAttribute($name, $value);
         }
 
-        $request = $request->withAttribute(RouteResult::class, new RouteResult($instance, $method));
+        $result = $this->resolver->resolve($route);
+
+        $request = $request->withAttribute(RouteResult::class, $result);
 
         $response = $delegate->process($request);
 
         if ($response instanceof ViewModel) {
             if ($response->getTemplate() === null) {
-                $response = $response->withTemplate($template);
+                $response = $response->withTemplate($result->getTemplate());
             }
         }
 
