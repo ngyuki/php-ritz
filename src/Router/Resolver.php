@@ -10,6 +10,7 @@ class Resolver
         $controller = preg_replace('/Controller(\\\\|$)/', '', $controller);
         $controller = str_replace('\\', DIRECTORY_SEPARATOR, $controller);
         $method = "{$action}Action";
-        return [$controller, $action, $class, $method];
+        $template = "$controller/$action";
+        return [$class, $method, $template];
     }
 }

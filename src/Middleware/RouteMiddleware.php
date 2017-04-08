@@ -48,7 +48,7 @@ class RouteMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         }
 
-        list ($controller, $action, $class, $method) = $this->resolver->resolve($route);
+        list ($class, $method, $template) = $this->resolver->resolve($route);
 
         if ($class === null) {
             return $delegate->process($request);
@@ -66,7 +66,7 @@ class RouteMiddleware implements MiddlewareInterface
 
         if ($response instanceof ViewModel) {
             if ($response->getTemplate() === null) {
-                $response = $response->withTemplate("$controller/$action");
+                $response = $response->withTemplate($template);
             }
         }
 
