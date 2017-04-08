@@ -80,6 +80,7 @@ class Application implements MiddlewareInterface
             return (new ViewModel())->withTemplate('Error/error')
                 ->withVariable('exception', $ex)
                 ->withVariable('debug', $debug)
+                ->withStatus(500)
             ;
         }
     }
