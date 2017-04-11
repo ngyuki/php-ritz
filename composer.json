@@ -1,4 +1,7 @@
 {
+    "name": "ngyuki/php-oreore",
+    "type": "library",
+    "license": "MIT",
     "require": {
         "zendframework/zend-diactoros": "^1.3",
         "zendframework/zend-stratigility": "^2.0",
