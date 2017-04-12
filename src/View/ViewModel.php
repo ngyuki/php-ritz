@@ -1,9 +1,9 @@
 <?php
 namespace ngyuki\Ritz\View;
 
-use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\HtmlResponse;
 
-class ViewModel extends Response
+class ViewModel extends HtmlResponse
 {
     /**
      * @var string
@@ -17,7 +17,7 @@ class ViewModel extends Response
 
     public function __construct(array $variables = [])
     {
-        parent::__construct();
+        parent::__construct('');
 
         $this->variables = $variables;
     }
