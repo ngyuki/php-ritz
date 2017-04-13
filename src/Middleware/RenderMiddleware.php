@@ -29,6 +29,7 @@ class RenderMiddleware implements MiddlewareInterface
             }
             $content = $this->renderer->render($response->getTemplate(), $response->getVariables());
             $response->getBody()->write($content);
+            $response->getBody()->rewind();
         }
 
         return $response;
