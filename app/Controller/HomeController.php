@@ -52,6 +52,13 @@ class HomeController implements MiddlewareInterface
         ];
     }
 
+    public function relativeTemplateAction()
+    {
+        return (new ViewModel())
+            ->withRelative('relative')
+            ->withVariable('msg', "テンプレート名を相対で指定する");
+    }
+
     public function responseAction()
     {
         return new TextResponse("アクションから Response オブジェクトを直接返すこともできる");
