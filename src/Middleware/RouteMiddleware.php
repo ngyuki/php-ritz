@@ -51,12 +51,14 @@ class RouteMiddleware implements MiddlewareInterface
 
         if ($response instanceof ViewModel) {
             if ($response->getTemplate() === null) {
-                $response = $response->withTemplate($result->getTemplate());
+                if ($response->getRelative() === null) {
+                    $response = $response->withTemplate($result->getTemplate());
+                } else {
+                    $response = $response->withTemplate(dirname($result->getTemplate()) . '/' . $response->getRelative());
+                }
             }
         }
 
         return $response;
     }
 }
-
-
