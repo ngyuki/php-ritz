@@ -13,8 +13,13 @@ use Invoker\ParameterResolver\TypeHintResolver;
 use Zend\Diactoros\Response\TextResponse;
 use ngyuki\Ritz\View\ViewModel;
 
-class ActionInvoker extends Invoker
+class ActionInvoker
 {
+    /**
+     * @var Invoker
+     */
+    private $internalInvoker;
+
     public function __construct(ContainerInterface $container)
     {
         if ($container instanceof InteropContainerInterface) {
@@ -29,7 +34,8 @@ class ActionInvoker extends Invoker
                 new AssociativeArrayResolver(),
             ];
         }
-        parent::__construct(new ResolverChain($chain));
+
+        $this->internalInvoker = new Invoker(new ResolverChain($chain));
     }
 
     public function invoke(ServerRequestInterface $request, DelegateInterface $delegate, $instance, $method)
@@ -41,7 +47,7 @@ class ActionInvoker extends Invoker
 
         $parameters += $request->getAttributes();
 
-        $response = $this->call([$instance, $method], $parameters);
+        $response = $this->internalInvoker->call([$instance, $method], $parameters);
 
         if (is_array($response)) {
             return new ViewModel($response);
