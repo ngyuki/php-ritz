@@ -1,6 +1,7 @@
 <?php
 namespace ngyuki\Ritz\Bootstrap;
 
+use ngyuki\Ritz\Exception\HttpException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
@@ -24,7 +25,6 @@ class Server
 
         if ($debug) {
             $pipeline->pipe($this->dumpOutputMiddleware());
-            $pipeline->pipe($this->debugErrorHandlerMiddleware());
         } else {
             $pipeline->pipe($this->errorHandlerMiddleware());
         }
@@ -99,28 +99,11 @@ class Server
         return function (ServerRequestInterface $request, DelegateInterface $delegate) {
             try {
                 return $delegate->process($request);
+            } catch (HttpException $ex) {
+                return new TextResponse($ex->getCode() . ' ' . $ex->getMessage(), $ex->getCode());
             } catch (\Exception $ex) {
                 error_log($ex);
-                $response = (new TextResponse(''))->withStatus(500);
-                $response->getBody()->write($response->getStatusCode() . ' ' . $response->getReasonPhrase());
-                return $response;
-            }
-        };
-    }
-
-    /**
-     * 最上位のエラーハンドラミドルウェア(デバッグ版)
-     *
-     * @return \Closure
-     */
-    private function debugErrorHandlerMiddleware()
-    {
-        return function (ServerRequestInterface $request, DelegateInterface $delegate) {
-            try {
-                return $delegate->process($request);
-            } catch (\Exception $ex) {
-                $response = (new TextResponse((string)$ex))->withStatus(500);
-                return $response;
+                return new TextResponse('Unexpected Error', 500);
             }
         };
     }
