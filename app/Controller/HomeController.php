@@ -3,12 +3,10 @@ namespace App\Controller;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use ngyuki\Ritz\Exception\HttpException;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use ngyuki\Ritz\View\ViewModel;
-use App\Component\IdentityInterface;
-use App\Component\Session;
-use App\Service\HelloService;
 
 class HomeController implements MiddlewareInterface
 {
@@ -17,29 +15,23 @@ class HomeController implements MiddlewareInterface
         $response = $delegate->process($request);
 
         if ($response instanceof ViewModel) {
+            $msg = $response->getVariables()['msg'] ?? null;
             $response = $response->withVariable(
-                'process', "Controller で MiddlewareInterface を実装するとアクションの前段のミドルウェアとして実行される"
+                'msg', "$msg ... Controller で MiddlewareInterface を実装するとアクションの前段のミドルウェアとして実行される"
             );
         }
 
         return $response;
     }
 
-    public function indexAction(IdentityInterface $identity, Session $session, HelloService $hello)
+    public function indexAction()
     {
-        $val = $session['val'] = $session['val'] + 1;
-
-        return [
-            'hello' => $hello->say($identity->get('username')),
-            'val' => $val,
-            'msg' => "アクションから連想配列を返すと自動で ViewModel となってレンダリングされる",
-        ];
+        return [];
     }
 
     public function viewAction()
     {
-        return (new ViewModel())->withTemplate('App/Home/alt-view')->withVariables([
-            'val' => __METHOD__,
+        return (new ViewModel())->withTemplate('App/Home/view2')->withVariables([
             'msg' => "アクションから ViewModel 返すときにテンプレートで別の名前を指定する",
         ]);
     }
@@ -52,16 +44,21 @@ class HomeController implements MiddlewareInterface
         ];
     }
 
-    public function relativeTemplateAction()
+    public function relativeAction()
     {
         return (new ViewModel())
-            ->withRelative('relative')
+            ->withRelative('relative-template')
             ->withVariable('msg', "テンプレート名を相対で指定する");
     }
 
     public function responseAction()
     {
-        return new TextResponse("アクションから Response オブジェクトを直接返すこともできる");
+        return new TextResponse("アクションから Response オブジェクトを直接返す");
+    }
+
+    public function forbiddenAction()
+    {
+        throw new HttpException(null, 403);
     }
 
     public function raiseAction()

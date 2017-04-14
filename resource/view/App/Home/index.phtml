@@ -1,5 +1,10 @@
-<?php $this->layout('App/Home/_layout') ?>
+<?php $this->layout('Layout/layout') ?>
 
-<p><?= $this->h($hello) ?> ... <?= $this->h($val) ?> views</p>
-
-<p><?= $this->h($msg) ?></p>
+<div class="list-group">
+    <a class="list-group-item" href="/view">/view</a>
+    <a class="list-group-item" href="/relative">/relative</a>
+    <a class="list-group-item" href="/user/hoge">/user/hoge</a>
+    <a class="list-group-item" href="/response">/response</a>
+    <a class="list-group-item" href="/error/403">/error/403</a>
+    <a class="list-group-item" href="/raise">/raise</a>
+</div>

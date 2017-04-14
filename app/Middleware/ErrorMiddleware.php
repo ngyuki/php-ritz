@@ -3,6 +3,7 @@ namespace App\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use ngyuki\Ritz\Exception\HttpException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ngyuki\Ritz\View\ViewModel;
@@ -25,11 +26,17 @@ class ErrorMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         } catch (\Exception $ex) {
             $debug = $this->container->get('debug');
-            return (new ViewModel())
+            if ($ex instanceof HttpException === false) {
+                $ex = new HttpException();
+            }
+            $response = (new ViewModel())
                 ->withTemplate('Error/error')
+                ->withVariable('message', $ex->getMessage())
                 ->withVariable('exception', $ex)
                 ->withVariable('debug', $debug)
-                ->withStatus(500);
+                ->withStatus($ex->getCode())
+            ;
+            return $response;
         }
     }
 }

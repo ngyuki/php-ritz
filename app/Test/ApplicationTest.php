@@ -75,12 +75,12 @@ class ApplicationTest extends TestCase
     {
         $container = $this->initWithIdentity();
 
-        $request = $this->createRequest('http://localhost/relative-template');
+        $request = $this->createRequest('http://localhost/relative');
         $response = $this->handle($request, $container);
 
         self::assertEquals(200, $response->getStatusCode());
 
         $document = new Document($response->getBody()->getContents());
-        self::assertContains('relative.phtml', $this->query($document, '#file')->textContent);
+        self::assertContains('relative-template.phtml', $this->query($document, '#file')->textContent);
     }
 }
