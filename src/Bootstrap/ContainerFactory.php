@@ -2,16 +2,18 @@
 namespace ngyuki\Ritz\Bootstrap;
 
 use Psr\Container\ContainerInterface;
+use DI\ContainerBuilder;
+use Doctrine\Common\Cache\FilesystemCache;
 
+use ngyuki\Ritz\Middleware\RouteMiddleware;
+use ngyuki\Ritz\Middleware\RenderMiddleware;
+use ngyuki\Ritz\Middleware\DispatchMiddleware;
+use ngyuki\Ritz\Router\Resolver;
 use ngyuki\Ritz\Router\Router;
+use ngyuki\Ritz\Dispatcher\ActionInvoker;
 use ngyuki\Ritz\View\RendererInterface;
 use ngyuki\Ritz\View\PhpRenderer;
 use ngyuki\Ritz\View\TemplateResolver;
-
-use Doctrine\Common\Cache\FilesystemCache;
-use DI\ContainerBuilder;
-use function DI\object;
-use function DI\get;
 
 class ContainerFactory
 {
@@ -21,14 +23,7 @@ class ContainerFactory
      */
     public function create(array $definitions)
     {
-        $definitions += [
-            'debug'                   => true,
-            'app.cache_dir'           => null,
-            ContainerInterface::class => function ($container) { return $container; },
-            Router::class             => object(Router::class)->constructor(get('app.routes'), get('app.cache_dir')),
-            TemplateResolver::class   => object(TemplateResolver::class)->constructor(get('app.view.directory'), get('app.view.suffix')),
-            RendererInterface::class  => get(PhpRenderer::class),
-        ];
+        $definitions += $this->getDefaultDefinitions();
 
         $builder = new ContainerBuilder();
 
@@ -39,5 +34,49 @@ class ContainerFactory
 
         $container = $builder->addDefinitions($definitions)->build();
         return $container;
+    }
+
+    public function getDefaultDefinitions()
+    {
+        return [
+            'debug' => true,
+            'app.cache_dir' => null,
+
+            ContainerInterface::class => function ($container) {
+                return $container;
+            },
+
+            RouteMiddleware::class => function (ContainerInterface $container) {
+                return new RouteMiddleware($container->get(Router::class), $container->get(Resolver::class));
+            },
+
+            DispatchMiddleware::class => function (ContainerInterface $container) {
+                return new DispatchMiddleware($container, $container->get(ActionInvoker::class));
+            },
+
+            RenderMiddleware::class => function (ContainerInterface $container) {
+                return new RenderMiddleware($container->get(RendererInterface::class));
+            },
+
+            Router::class => function (ContainerInterface $container) {
+                return new Router($container->get('app.routes'), $container->get('app.cache_dir'));
+            },
+
+            Resolver::class => function (ContainerInterface $container) {
+                return new Resolver($container);
+            },
+
+            ActionInvoker::class => function (ContainerInterface $container) {
+                return new ActionInvoker($container);
+            },
+
+            RendererInterface::class => function (ContainerInterface $container) {
+                return new PhpRenderer($container->get(TemplateResolver::class));
+            },
+
+            TemplateResolver::class => function (ContainerInterface $container) {
+                return new TemplateResolver($container->get('app.view.directory'), $container->get('app.view.suffix'));
+            },
+        ];
     }
 }
