@@ -9,13 +9,19 @@ class PhpRenderer implements RendererInterface
     private $layout = null;
 
     /**
-     * @var TemplateResolver
+     * @var string
      */
-    private $resolver;
+    private $directory;
 
-    public function __construct(TemplateResolver $resolver)
+    /**
+     * @var string
+     */
+    private $suffix;
+
+    public function __construct($directory, $suffix = '.phtml')
     {
-        $this->resolver = $resolver;
+        $this->directory = $directory;
+        $this->suffix = $suffix;
     }
 
     public function render($template, array $variables)
@@ -29,7 +35,7 @@ class PhpRenderer implements RendererInterface
                 /** @noinspection PhpIncludeInspection */
                 include func_get_arg(0);
                 return ob_get_clean();
-            })($this->resolver->resolve($template), $variables);
+            })($this->resolve($template), $variables);
 
             if ($this->layout === null) {
                 break;
@@ -41,6 +47,15 @@ class PhpRenderer implements RendererInterface
         }
 
         return $content;
+    }
+
+    /**
+     * @param string $template
+     * @return string
+     */
+    protected function resolve($template)
+    {
+        return $this->directory . DIRECTORY_SEPARATOR . $template . $this->suffix;
     }
 
     /**

@@ -13,7 +13,6 @@ use ngyuki\Ritz\Router\Router;
 use ngyuki\Ritz\Dispatcher\ActionInvoker;
 use ngyuki\Ritz\View\RendererInterface;
 use ngyuki\Ritz\View\PhpRenderer;
-use ngyuki\Ritz\View\TemplateResolver;
 
 class ContainerFactory
 {
@@ -71,11 +70,7 @@ class ContainerFactory
             },
 
             RendererInterface::class => function (ContainerInterface $container) {
-                return new PhpRenderer($container->get(TemplateResolver::class));
-            },
-
-            TemplateResolver::class => function (ContainerInterface $container) {
-                return new TemplateResolver($container->get('app.view.directory'), $container->get('app.view.suffix'));
+                return new PhpRenderer($container->get('app.view.directory'), $container->get('app.view.suffix'));
             },
         ];
     }
