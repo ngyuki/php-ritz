@@ -356,5 +356,8 @@ return (new Configure())
 
 ## Factory と Interface
 
-フレームワークを構成するクラスは Factory と Interface も用意しておくことで、
-PHP-DI 以外の DI コンテナでも使えるようにする。
+フレームワークを構成するクラスは Factory と Interface も用意しておくことで、PHP-DI 以外の DI コンテナでも使いやすくする？
+
+全部に Factory を作るのは過剰な気もするので、ContainerFactory を PHP-DI の記法ではなくクロージャーを用いたファクトリを使うことでコピペで別のコンテナのファクトリを作りやすくする。
+
+ミドルウェアについてはインタフェースにする意味があんまりない。MiddlewareInterface なので。インタフェースを作ったとしても DI のエントリの ID にするぐらいしか使い道は無い。
