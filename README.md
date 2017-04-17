@@ -112,3 +112,256 @@ Route と Dispatch の間のミドルウェアで、コントローラーのイ�
 ので、Route の段階でコントローラーをインスタンス化する必要がある。
 
 Route -> Load -> Dispatch のような３段のミドルウェアにしても良いかもしれないけど、うーん。
+
+## ルーティングで設定するコントローラー名
+
+`HogeController::class` のようにクラス名を直接指定するようにしたい。
+ただ、コントローラーのクラス名からテンプレートを導出する方法が課題。
+
+例えば `App\HogeController` なら `app/hoge` にするとか？ ZF2 はこの形式。
+PSR-4 により 名前空間の App はディレクトリに現れないにも関わらず、
+テンプレートでは app ディレクトリが現れるのが微妙？
+トップに `app` `error` `layout` ディレクトリが来るなら自然な気もする？
+（今までは `_layout` みたいに普通のテンプレートのディレクトリと区別してたし）
+
+ZE はコントローラーでテンプレート名を明示するのでそういう問題はない。
+
+コントローラー名からテンプレートディレクトリの解決にも PSR-4 みたいな方法を使う？
+
+```php
+return [
+    'app.view.autoload' => [
+        'App\\Controller\\' => __DIR__ . '/resource/view/',
+    ],
+];
+```
+
+## デフォルトのテンプレート名は誰が設定する？
+
+いま Route ミドルウェアでデフォルトのテンプレート名を設定しているけどこれは妥当？
+
+パイプラインを Route -> Render -> Dispatch の並びにして、
+Route 結果から Render でデフォルトのテンプレート名を使うほうが自然？
+
+その場合、いま RouteResult はコントローラーのインスタンスとメソッド名しか持っていないので、
+そこからテンプレート名を導出すれば良いか？
+
+あるいは RouteResult で $template みたいなプロパティを増やす？
+Route ミドルウェアの役割を次の通りに考えればそんなに不自然でも無い。
+
+「ディスパッチするコントローラー＆メソッドとレンダリングするテンプレートをリクエストから導出する」
+
+## セッション
+
+- zend-session はユニットテストのためのスタブ的なのが標準で用意されていない？
+    - `runInSeparateProcess` でどうにかすることも出来なくはないが・・
+    - 直接セッションに依存しないよにすればいいのだけどうーん
+- symfony はセッションが http-foundation に含むのが微妙
+- laravel のセッションは依存でかすぎ
+- aura/session もユニットテストのためのスタブみたいなのなさ気な気がする
+    - むしろ無いのが普通？
+
+## PSR のリクエストオブジェクトがショボい件
+
+仕方がないことだけど PSR-7 の ServerRequestInterface をそのまま使うと、
+Symfony とかと比べてショボさ感じる。
+リクエストメソッドのチェックとかクエリパラメータの取得とか。
+
+```php
+if (strtoupper($request->getMethod()) === 'POST') {
+    $val = $request->getParsedBody()['val'] ?? null;
+}
+```
+
+こんな感じに書きたい。
+
+```php
+if ($request->isMethod('POST'))) {
+    $val = $request->getPost('val');
+}
+```
+
+アクションの引数にはリクエストのアトリビュートを元に DI されるので、
+ディスパッチャーの前段のミドルウェアでラップしたオブジェクトを入れる？
+ただし Controller で MiddlewareInterface を実装している場合、
+前段のミドルウェアとアクションの間で呼ばれるので、そこでリクエストを with すると、
+アクションに渡されるリクエストとラップしたリクエストの中身が異なってしまう。
+あんまり無いことだとは思うけど。
+
+アクションの Invoker を継承してアトリビュートを追加する？
+
+```php
+public function invoke(ServerRequestInterface $request, DelegateInterface $delegate, $instance, $method)
+{
+    $request = $request->withAttribute(UsefulRequest::class, new UsefulRequest($request));
+    return parent::invoke($request, $delegate, $instance, $method);
+}
+```
+
+あるいは、Controller の process と、アクションの間に挟まるミドルウェアを作れるようにする？
+いや寧ろ Controller の process を実行するミドルウェアを別に設ける？
+
+## ルーティング
+
+ルーティングが書きにくい気がする。。。
+無理にインデントを揃えようとするから？
+
+```php
+return [
+    'app.routes' => value(function(RouteCollector $r) {
+        $r->get('/', [HomeController::class, 'index']);
+        $r->get('/view', [HomeController::class, 'view']);
+        $r->get('/response', [HomeController::class, 'response']);
+        $r->get('/raise', [HomeController::class, 'raise']);
+        $r->get('/login', [LoginController::class, 'index']);
+        $r->post('/login', [LoginController::class, 'login']);
+        $r->get('/logout', [LoginController::class, 'logout']);
+        $r->addGroup('/user', function (RouteCollector $r) {
+            $r->get('/{name}', [HomeController::class, 'user']);
+        });
+    }),
+];
+```
+
+配列でコントローラーとメソッドを分けているから角括弧で見にくくなっているのだろうか。
+RouteCollector をラップして次のようにしてみる？
+
+```php
+return [
+    'app.routes' => value(function(RouteCollector $r) {
+        $r->get('/', HomeController::class, 'index');
+        $r->get('/view', HomeController::class, 'view');
+        $r->get('/response', HomeController::class, 'response');
+        $r->get('/raise', HomeController::class, 'raise');
+        $r->get('/login', LoginController::class, 'index');
+        $r->post('/login', LoginController::class, 'login');
+        $r->get('/logout', LoginController::class, 'logout');
+        $r->addGroup('/user', function (RouteCollector $r) {
+            $r->get('/{name}', HomeController::class, 'user');
+        });
+    }),
+];
+```
+
+普通に文字列結合でもいい気がする。
+
+```php
+return function(RouteCollector $r) {
+    $r->get('/', HomeController::class . '@index');
+    $r->get('/view', HomeController::class . '@view');
+    $r->get('/response', HomeController::class . '@response');
+    $r->get('/raise', HomeController::class . '@raise');
+    $r->get('/login', LoginController::class . '@index');
+    $r->post('/login', LoginController::class . '@login');
+    $r->get('/logout', LoginController::class . '@logout');
+    $r->addGroup('/user', function (RouteCollector $r) {
+        $r->get('/{name}', HomeController::class . '@user');
+    });
+});
+```
+
+メソッドチェイン？
+
+```php
+return function(RouteCollector $r) {
+    $r->get('/')->controller(HomeController::class)->method('index');
+    $r->get('/view')->controller(HomeController::class)->method('view');
+    $r->get('/response')->controller(HomeController::class)->method('response');
+    $r->get('/raise')->controller(HomeController::class)->method('raise');
+    $r->get('/login')->controller(LoginController::class)->method('index');
+    $r->post('/login')->controller(LoginController::class)->method('login');
+    $r->get('/logout')->controller(LoginController::class)->method('logout');
+    $r->addGroup('/user', function (RouteCollector $r) {
+        $r->get('/{name}')->controller(HomeController::class)->method('@user');
+    });
+});
+```
+
+こんな風にグループ化できると良いかも？
+
+```php
+return function(RouteCollector $r) {
+    $r->controller(UserController::class)->group(function (RouteCollector $r) {
+            $r->prefix('/user')->group(function (RouteCollector $r) {
+                $r->get('', 'index');
+                $r->get('/new', 'create');
+                $r->post('/new', 'create');
+            });
+            $r->prefix('/user/{id}')->group(function (RouteCollector $r) {
+                $r->get('', 'show');
+                $r->get('/edit', 'edit');
+                $r->post('/edit', 'edit');
+                $r->get('/delete', 'delete');
+                $r->post('/delete', 'delete');
+            });
+        })
+    ;
+});
+```
+
+## コンフィグファイルのキャッシュ
+
+glob は多分遅いのでファイル名をキャッシュするといいと思うんだけど、
+キャッシュするかの設定をコンフィグファイルに書くので、鶏卵になってしまう。
+
+例えば Bootstrap.php は固定で特定のファイルを読んで、そこにキャッシュの設定がある前提にする？
+
+```php
+$config = require __DIR__ . '/../bootstrap/app.php';
+return (new Configure())
+    ->useCache($config['app.config.cache_dir'] ?? null)
+    ->init(function(){
+        $env = getenv(APP_ENV);
+        return array_merge(
+            glob(__DIR__ . '/../bootstrap/*.php'),
+            glob(__DIR__ . '/../config/default.php'),
+            glob(__DIR__ . '/../config/local.php')
+        );
+    })
+;
+```
+
+`app.php` が２回読まれるけど、別に良い？
+次のように最初に読むファイルも Configure に読ませて重複排除する？
+
+```php
+return (new Configure())
+    ->load(__DIR__ . '/../bootstrap/app.php')
+    ->useCache(function ($config){
+        return $config['app.config.cache_dir'] ?? null;
+    })
+    ->load(function(){
+        $env = getenv(APP_ENV);
+        return array_merge(
+            glob(__DIR__ . '/../bootstrap/*.php'),
+            glob(__DIR__ . '/../config/default.php'),
+            glob(__DIR__ . "/../config/$env.php"),
+            glob(__DIR__ . '/../config/local.php')
+        );
+    })
+    ->get()
+;
+```
+
+## HTTP例外
+
+レスポンスコードを持つ HTTP な例外とか Response オブジェクトをフレームワークで用意しておく？
+
+Response オブジェクトについては、テンプレートのレンダリングも必要なので意味がないか？
+あるいはエラー系の Response はエラーハンドラミドルウェアでレンダリングする？
+
+## デバッグフラグ
+
+デバッグフラグはいろいろな場所で見たいことがあると思うけど、
+いちいち DI 定義するのはめんどくさすぎる・・・
+
+- DebugMiddleware がリクエストのアトリビュートに入れる
+    - Controller 以外で使うときに面倒くさい
+- Debug クラスを作ってオートワイヤリングで DI する
+    - それだけのために Debug クラスなんてのを作るのは過剰な気がする
+- Config みたいなフレームワークの基本的なコンフィグを持つクラスを作る
+
+## Factory と Interface
+
+フレームワークを構成するクラスは Factory と Interface も用意しておくことで、
+PHP-DI 以外の DI コンテナでも使えるようにする。
