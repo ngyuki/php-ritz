@@ -17,11 +17,11 @@ class Resolver
 
     public function resolve($route)
     {
-        list ($class, $action) = $route;
+        list ($class, $method) = $route;
         $controller = $class;
         $controller = preg_replace('/Controller(\\\\|$)/', '', $controller);
         $controller = str_replace('\\', DIRECTORY_SEPARATOR, $controller);
-        $method = "{$action}Action";
+        $action = preg_replace('/Action$/', '', $method);
         $template = "$controller/$action";
         $instance = $this->container->get($class);
         return new RouteResult($instance, $method, $template);
