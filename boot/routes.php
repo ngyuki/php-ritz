@@ -8,19 +8,19 @@ use App\Controller\LoginController;
 
 return [
     'app.routes' => value(function(RouteCollector $r) {
-        $r->get('/',          [HomeController::class, 'index']);
-        $r->get('/view',      [HomeController::class, 'view']);
-        $r->get('/response',  [HomeController::class, 'response']);
-        $r->get('/raise',     [HomeController::class, 'raise']);
-        $r->get('/relative',  [HomeController::class, 'relative']);
-        $r->get('/error/403', [HomeController::class, 'forbidden']);
+        $r->get('/',          [HomeController::class, 'indexAction']);
+        $r->get('/view',      [HomeController::class, 'viewAction']);
+        $r->get('/response',  [HomeController::class, 'responseAction']);
+        $r->get('/raise',     [HomeController::class, 'raiseAction']);
+        $r->get('/relative',  [HomeController::class, 'relativeAction']);
+        $r->get('/error/403', [HomeController::class, 'forbiddenAction']);
 
-        $r->get('/login',    [LoginController::class, 'index']);
-        $r->post('/login',   [LoginController::class, 'login']);
-        $r->get('/logout',   [LoginController::class, 'logout']);
+        $r->get('/login',    [LoginController::class, 'indexAction']);
+        $r->post('/login',   [LoginController::class, 'loginAction']);
+        $r->get('/logout',   [LoginController::class, 'logoutAction']);
 
         $r->addGroup('/user', function (RouteCollector $r) {
-            $r->get('/{name}', [HomeController::class, 'user']);
+            $r->get('/{name}', [HomeController::class, 'userAction']);
         });
     }),
 ];
