@@ -23,6 +23,8 @@ class Server
     {
         $pipeline = new MiddlewarePipe();
 
+        $pipeline->pipe($this->protocolVersionMiddleware());
+
         if ($debug) {
             $pipeline->pipe($this->dumpOutputMiddleware());
         } else {
@@ -105,6 +107,20 @@ class Server
                 error_log($ex);
                 return new TextResponse('Unexpected Error', 500);
             }
+        };
+    }
+
+    /**
+     * リクエストのプロトコルバージョンを元にレスポンスのプロトコルバージョンを設定するミドルウェア
+     *
+     * @return \Closure
+     */
+    private function protocolVersionMiddleware()
+    {
+        return function (ServerRequestInterface $request, DelegateInterface $delegate) {
+            $response = $delegate->process($request);
+            $response = $response->withProtocolVersion($request->getProtocolVersion());
+            return $response;
         };
     }
 }
