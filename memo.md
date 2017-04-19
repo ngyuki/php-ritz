@@ -366,3 +366,40 @@ return (new Configure())
 全部に Factory を作るのは過剰な気もするので、ContainerFactory を PHP-DI の記法ではなくクロージャーを用いたファクトリを使うことでコピペで別のコンテナのファクトリを作りやすくする。
 
 ミドルウェアについてはインタフェースにする意味があんまりない。MiddlewareInterface なので。インタフェースを作ったとしても DI のエントリの ID にするぐらいしか使い道は無い。
+
+## Server もコンテナに入れる？
+
+```php
+$server = new Server();
+$server->run($container->get(Application::class), $container->get('debug'));
+```
+
+みたいなコードがちょっと微妙な感じする。
+
+```php
+/* app.php */
+return [
+    'debug' => true,
+    'app.class' => Application::class,
+];
+
+/* index.php */
+$container->get(Server::class)->run();
+
+/* ContainerFactory.php */
+return [
+    Server::class => function ($container) {
+        return new Server(
+            $container->get($container->get(Application::class)),
+            $container->get('debug')
+        );
+    },
+];
+```
+
+`'app.class'` は無くてもいいかな？
+
+```php
+/* index.php */
+$container->get(Server::class)->run(Application::class);
+```
