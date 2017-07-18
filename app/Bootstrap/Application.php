@@ -1,11 +1,12 @@
 <?php
-namespace App;
+namespace App\Bootstrap;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Stratigility\MiddlewarePipe;
+use ngyuki\Ritz\Bootstrap\Server;
 use ngyuki\Ritz\Middleware\DispatchMiddleware;
 use ngyuki\Ritz\Middleware\RenderMiddleware;
 use ngyuki\Ritz\Middleware\RouteMiddleware;
@@ -15,6 +16,13 @@ use Franzl\Middleware\Whoops\PSR15Middleware as WhoopsMiddleware;
 
 class Application implements MiddlewareInterface
 {
+    public static function main()
+    {
+        $container = (new ContainerFactory())->create();
+        $server = new Server();
+        $server->run($container->get(Application::class), $container->get('debug'));
+    }
+
     /**
      * @var ContainerInterface
      */

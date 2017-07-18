@@ -1,8 +1,8 @@
 <?php
 namespace App\Test\Test;
 
-use App\Application;
-use App\Bootstrap;
+use App\Bootstrap\Application;
+use App\Bootstrap\ContainerFactory;
 use App\Component\IdentityInterface;
 use App\Component\IdentityStab;
 use Interop\Container\ContainerInterface;
@@ -21,7 +21,7 @@ class ApplicationTest extends TestCase
         $identity = new IdentityStab();
         $identity->set(['username' => 'oreore']);
 
-        $container = Bootstrap::init();
+        $container = (new ContainerFactory)->create();
         $container->set(IdentityInterface::class, $identity);
 
         return $container;
@@ -46,7 +46,7 @@ class ApplicationTest extends TestCase
 
     function handle(ServerRequestInterface $request, ContainerInterface $container = null)
     {
-        $container = $container ?: Bootstrap::init();
+        $container = $container ?: (new ContainerFactory)->create();
         $response = (new Server())->handle($container->get(Application::class), $request);
         return $response;
     }
