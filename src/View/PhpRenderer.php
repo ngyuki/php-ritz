@@ -31,10 +31,14 @@ class PhpRenderer implements RendererInterface
         for (;;) {
             $content = (function(){
                 ob_start();
-                extract(func_get_arg(1));
-                /** @noinspection PhpIncludeInspection */
-                include func_get_arg(0);
-                return ob_get_clean();
+                try {
+                    extract(func_get_arg(1));
+                    /** @noinspection PhpIncludeInspection */
+                    include func_get_arg(0);
+                    return ob_get_contents();
+                } finally {
+                    ob_end_clean();
+                }
             })($this->resolve($template), $variables);
 
             if ($this->layout === null) {
