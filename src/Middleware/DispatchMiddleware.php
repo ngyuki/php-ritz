@@ -30,21 +30,12 @@ class DispatchMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         }
 
-        $pipeline = new MiddlewarePipe();
-
-        if ($instance instanceof MiddlewareInterface) {
-            $pipeline->pipe($instance);
-        }
-
-        if ($method === null) {
-            return $pipeline->process($request, $delegate);
-        }
-
         $action = function (ServerRequestInterface $request, DelegateInterface $delegate) use ($instance, $method) {
             $response = $this->invoker->invoke($request, $delegate, $instance, $method);
             return $response;
         };
 
+        $pipeline = new MiddlewarePipe();
         $pipeline->pipe($action);
 
         return $pipeline->process($request, $delegate);

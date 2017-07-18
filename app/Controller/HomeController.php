@@ -1,29 +1,12 @@
 <?php
 namespace App\Controller;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use ngyuki\Ritz\Exception\HttpException;
-use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\TextResponse;
 use ngyuki\Ritz\View\ViewModel;
 
-class HomeController implements MiddlewareInterface
+class HomeController
 {
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        $response = $delegate->process($request);
-
-        if ($response instanceof ViewModel) {
-            $msg = $response->getVariables()['msg'] ?? null;
-            $response = $response->withVariable(
-                'msg', "$msg ... Controller で MiddlewareInterface を実装するとアクションの前段のミドルウェアとして実行される"
-            );
-        }
-
-        return $response;
-    }
-
     public function indexAction()
     {
         return [];
