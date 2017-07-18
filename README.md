@@ -320,7 +320,7 @@ return new TextResponse("hello");
 
 例えば `App\Controller\HomeController::indexAction` というクラス名・メソッド名であれば、テンプレートは `App/Home/index` となります。
 
-## コントローラーでミドルウェアを実装
+## コントローラーでミドルウェアを実装 → 廃止
 
 コントローラーで PSR-15 の `MiddlewareInterface` を実装すると、アクションの前段のミドルウェアとしてコントローラー自身が組み込まれます。これはコントローラーごとの Pre/PostDispatch として使用できます。
 
@@ -340,4 +340,19 @@ class HomeController implements MiddlewareInterface
 }
 ```
 
+**※廃止**
 
+もしそういうことがやりたければそういう Middleware を作ると良いです。
+
+```php
+public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+        $instance = RouteResult::from($request)->getInstance();
+        if ($instance instanceof MiddlewareInterface) {
+            $pipeline = new MiddlewarePipe();
+            $pipeline->pipe($instance);
+            return $pipeline->process($request, $delegate);
+        }
+        return $delegate->process($request);
+    }
+}
+```

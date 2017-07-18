@@ -47,9 +47,9 @@ PSR-7(HTTP Message Interface) とか PHR-15(HTTP Middlewares) とか。
         - https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/ResourceObject.php
     - そもそもリクエスト/レスポンスの考え方からして独特
 
-## Action の戻り値
+## Action の戻り値は ViewModel にしてコントローラーがレンダラに依存しないようにする
 
-アクションの戻り値を Response にする案が考えられるが、それをしようとするとアクションの中でテンプレートのレンダリングが必要になるため、コントローラーが Renderer に依存してしまう。
+アクションの戻り値を Response にする案が考えられるが、それだとアクションの中でテンプレートのレンダリングが必要で、コントローラーがレンダラに依存することになってしまう。
 
 アクションはほとんどのケースで決まった名前のテンプレートに変数をアサインして表示するだけなので、アサインする変数の連想配列を返すだけで十分。
 
@@ -66,22 +66,20 @@ ViewModel もまた Response を実装することで、レンダリングはミ
 
 Response が ViewModel であればレンダリングした結果を withBody する。Response が ViewModel で無ければ何もしない（アクションからレスポンスを直接返したいとき）。テンプレート名も ViewModel に含んでいて、もし未指定ならデフォルトのテンプレート名が使用される（コントローラー名＋アクション名）。
 
-## Application/Controller の継承
+## Application/Controller は継承なしで実装できる前提
 
 Application/Controller はなるべく継承しない。継承前提だとコンストラクタインジェクションで DI しにくい。
 
 継承元の抽象クラスでコンストラクタを実装しないという案は考えられるけど、それならトレイトで十分。
 
-継承で実現していた TemplateMethod パターンによるフックポイントをどう代替するかが課題だが、下記の２つを設ける。
+継承で実現していた TemplateMethod パターンによるフックポイントをどう代替するかが課題だが、下記を設ける。
 
 - アプリケーションでパイプラインを自由に構築できる
     - プラグイン/アクションヘルパ/継承元コントローラーの Pre/PostDispatch に相当
-- コントローラーがミドルウェアを実装しているならディスパッチ前に呼び出す
-    - コントローラーごとの Pre/PostDispatch に相当
 
 アプリケーションクラスでパイプラインを作る必要があるのがちょっと手間かもしれない。
 
-## Forward の実装
+## Forward は実装が難しいので使用しない
 
 - Action で ForwardException とかを発破する
 - RouteMiddleware の直上の Middleware でキャッチする
@@ -104,21 +102,19 @@ Forward を使用しない前提で考える。
 
 この方法の問題はレンダリングの段階で発生したエラーはハンドリング出来ないこと。ただ、これはアプリケーションでパイプラインの作り方でどうとでもなる。エラーハンドラのミドルウェアをレンダリングの上にして、エラーハンドラでパイプラインを作って実行すれば良い。
 
-## コントローラーのロードをどこでやるか
+## コントローラーのロードはルーターでやる。
 
 Route と Dispatch の間のミドルウェアで、コントローラーのインスタンスを instanceof とかしたい。
 というのも、その位置のミドルウェアを ZF1 の Pre/PostDispatch のように使いたいため。
 
-ので、Route の段階でコントローラーをインスタンス化する必要がある。
-
-Route -> Load -> Dispatch のような３段のミドルウェアにしても良いかもしれないけど、うーん。
+ので、Route の段階でコントローラーをインスタンス化する。
 
 ## ルーティングで設定するコントローラー名
 
 `HogeController::class` のようにクラス名を直接指定するようにしたい。
 ただ、コントローラーのクラス名からテンプレートを導出する方法が課題。
 
-例えば `App\HogeController` なら `app/hoge` にするとか？ ZF2 はこの形式。
+例えば `App\Controller\HogeController` なら `app/hoge` にするとか？ ZF2 はこの形式。
 PSR-4 により 名前空間の App はディレクトリに現れないにも関わらず、
 テンプレートでは app ディレクトリが現れるのが微妙？
 トップに `app` `error` `layout` ディレクトリが来るなら自然な気もする？
@@ -188,10 +184,6 @@ if ($request->isMethod('POST'))) {
 
 アクションの引数にはリクエストのアトリビュートを元に DI されるので、
 ディスパッチャーの前段のミドルウェアでラップしたオブジェクトを入れる？
-ただし Controller で MiddlewareInterface を実装している場合、
-前段のミドルウェアとアクションの間で呼ばれるので、そこでリクエストを with すると、
-アクションに渡されるリクエストとラップしたリクエストの中身が異なってしまう。
-あんまり無いことだとは思うけど。
 
 アクションの Invoker を継承してアトリビュートを追加する？
 
@@ -202,9 +194,6 @@ public function invoke(ServerRequestInterface $request, DelegateInterface $deleg
     return parent::invoke($request, $delegate, $instance, $method);
 }
 ```
-
-あるいは、Controller の process と、アクションの間に挟まるミドルウェアを作れるようにする？
-いや寧ろ Controller の process を実行するミドルウェアを別に設ける？
 
 ## ルーティング
 
