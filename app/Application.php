@@ -11,6 +11,7 @@ use ngyuki\Ritz\Middleware\RenderMiddleware;
 use ngyuki\Ritz\Middleware\RouteMiddleware;
 use App\Middleware\ErrorMiddleware;
 use App\Middleware\LoginMiddleware;
+use Franzl\Middleware\Whoops\PSR15Middleware as WhoopsMiddleware;
 
 class Application implements MiddlewareInterface
 {
@@ -28,8 +29,14 @@ class Application implements MiddlewareInterface
     {
         $pipeline = new MiddlewarePipe();
 
+        if ($this->container->get('debug')) {
+            $pipeline->pipe(new WhoopsMiddleware());
+        }
         $pipeline->pipe($this->container->get(RenderMiddleware::class));
         $pipeline->pipe($this->container->get(ErrorMiddleware::class));
+        if ($this->container->get('debug')) {
+            $pipeline->pipe(new WhoopsMiddleware());
+        }
         $pipeline->pipe($this->container->get(RouteMiddleware::class));
         $pipeline->pipe($this->container->get(LoginMiddleware::class));
         $pipeline->pipe($this->container->get(DispatchMiddleware::class));

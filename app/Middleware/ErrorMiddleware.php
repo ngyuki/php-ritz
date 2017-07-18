@@ -25,15 +25,12 @@ class ErrorMiddleware implements MiddlewareInterface
         try {
             return $delegate->process($request);
         } catch (\Exception $ex) {
-            $debug = $this->container->get('debug');
             if ($ex instanceof HttpException === false) {
                 $ex = new HttpException();
             }
             $response = (new ViewModel())
                 ->withTemplate('Error/error')
                 ->withVariable('message', $ex->getMessage())
-                ->withVariable('exception', $ex)
-                ->withVariable('debug', $debug)
                 ->withStatus($ex->getCode())
             ;
             return $response;
