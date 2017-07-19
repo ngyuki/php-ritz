@@ -1,9 +1,9 @@
 <?php
 namespace App\Controller;
 
-use ngyuki\Ritz\Exception\HttpException;
+use Ritz\Exception\HttpException;
 use Zend\Diactoros\Response\TextResponse;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\ViewModel;
 
 class HomeController
 {

@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\ViewModel;
 use App\Component\IdentityInterface;
 use App\Service\LoginService;
 

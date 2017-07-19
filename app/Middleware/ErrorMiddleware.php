@@ -3,10 +3,10 @@ namespace App\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use ngyuki\Ritz\Exception\HttpException;
+use Ritz\Exception\HttpException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\ViewModel;
 
 class ErrorMiddleware implements MiddlewareInterface
 {

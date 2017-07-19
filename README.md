@@ -34,9 +34,9 @@
 <?php
 namespace App;
 
-use ngyuki\Ritz\Bootstrap\Configure;
-use ngyuki\Ritz\Bootstrap\ContainerFactory;
-use ngyuki\Ritz\Bootstrap\Server;
+use Ritz\Bootstrap\Configure;
+use Ritz\Bootstrap\ContainerFactory;
+use Ritz\Bootstrap\Server;
 
 require __DIR__  . '/../vendor/autoload.php';
 

@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Exception;
+namespace Ritz\Exception;
 
 use Throwable;
 use Zend\Diactoros\Response;

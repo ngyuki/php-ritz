@@ -1,13 +1,13 @@
 <?php
-namespace ngyuki\Ritz\Middleware;
+namespace Ritz\Middleware;
 
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Zend\Stratigility\MiddlewarePipe;
-use ngyuki\Ritz\Dispatcher\ActionInvoker;
-use ngyuki\Ritz\Router\RouteResult;
+use Ritz\Dispatcher\ActionInvoker;
+use Ritz\Router\RouteResult;
 
 class DispatchMiddleware implements MiddlewareInterface
 {

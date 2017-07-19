@@ -2,7 +2,7 @@
 namespace Test\Bootstrap;
 
 use PHPUnit\Framework\TestCase;
-use ngyuki\Ritz\Bootstrap\Configure;
+use Ritz\Bootstrap\Configure;
 
 class ConfigureTest extends TestCase
 {

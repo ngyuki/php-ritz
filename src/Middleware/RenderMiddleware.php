@@ -1,11 +1,11 @@
 <?php
-namespace ngyuki\Ritz\Middleware;
+namespace Ritz\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use ngyuki\Ritz\View\RendererInterface;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\RendererInterface;
+use Ritz\View\ViewModel;
 
 class RenderMiddleware implements MiddlewareInterface
 {

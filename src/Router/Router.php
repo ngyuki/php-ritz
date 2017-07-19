@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Router;
+namespace Ritz\Router;
 
 use function FastRoute\simpleDispatcher;
 use function FastRoute\cachedDispatcher;

@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Router;
+namespace Ritz\Router;
 
 use Psr\Container\ContainerInterface;
 

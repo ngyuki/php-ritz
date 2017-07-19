@@ -5,8 +5,8 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
-use ngyuki\Ritz\Router\RouteResult;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\Router\RouteResult;
+use Ritz\View\ViewModel;
 use App\Component\IdentityInterface;
 use App\Controller\LoginController;
 

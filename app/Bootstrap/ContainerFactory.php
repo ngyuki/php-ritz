@@ -1,8 +1,8 @@
 <?php
 namespace App\Bootstrap;
 
-use ngyuki\Ritz\Bootstrap\Configure;
-use ngyuki\Ritz\Bootstrap\ContainerFactory as BaseContainerFactory;
+use Ritz\Bootstrap\Configure;
+use Ritz\Bootstrap\ContainerFactory as BaseContainerFactory;
 
 class ContainerFactory
 {

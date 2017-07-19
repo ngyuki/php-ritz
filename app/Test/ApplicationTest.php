@@ -6,7 +6,7 @@ use App\Bootstrap\ContainerFactory;
 use App\Component\IdentityInterface;
 use App\Component\IdentityStab;
 use Interop\Container\ContainerInterface;
-use ngyuki\Ritz\Bootstrap\Server;
+use Ritz\Bootstrap\Server;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\ServerRequestFactory;

@@ -1,7 +1,7 @@
 <?php
-namespace ngyuki\Ritz\Bootstrap;
+namespace Ritz\Bootstrap;
 
-use ngyuki\Ritz\Exception\HttpException;
+use Ritz\Exception\HttpException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;

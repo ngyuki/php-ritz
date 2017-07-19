@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\View;
+namespace Ritz\View;
 
 use Zend\Diactoros\Response\HtmlResponse;
 

@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Dispatcher;
+namespace Ritz\Dispatcher;
 
 use Psr\Container\ContainerInterface;
 use Interop\Container\ContainerInterface as InteropContainerInterface;
@@ -11,7 +11,7 @@ use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use Invoker\ParameterResolver\TypeHintResolver;
 use Zend\Diactoros\Response\TextResponse;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\ViewModel;
 
 class ActionInvoker
 {

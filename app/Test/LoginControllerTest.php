@@ -4,7 +4,7 @@ namespace App\Controller;
 use App\Component\IdentityStab;
 use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\Response\RedirectResponse;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\View\ViewModel;
 use App\Service\LoginService;
 use Zend\Diactoros\ServerRequestFactory;
 

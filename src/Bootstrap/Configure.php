@@ -1,5 +1,5 @@
 <?php
-namespace ngyuki\Ritz\Bootstrap;
+namespace Ritz\Bootstrap;
 
 class Configure
 {

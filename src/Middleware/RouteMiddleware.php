@@ -1,13 +1,13 @@
 <?php
-namespace ngyuki\Ritz\Middleware;
+namespace Ritz\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use ngyuki\Ritz\Router\Resolver;
-use ngyuki\Ritz\Router\Router;
-use ngyuki\Ritz\Router\RouteResult;
-use ngyuki\Ritz\View\ViewModel;
+use Ritz\Router\Resolver;
+use Ritz\Router\Router;
+use Ritz\Router\RouteResult;
+use Ritz\View\ViewModel;
 
 class RouteMiddleware implements MiddlewareInterface
 {

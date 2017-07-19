@@ -1,18 +1,18 @@
 <?php
-namespace ngyuki\Ritz\Bootstrap;
+namespace Ritz\Bootstrap;
 
 use Psr\Container\ContainerInterface;
 use DI\ContainerBuilder;
 use Doctrine\Common\Cache\FilesystemCache;
 
-use ngyuki\Ritz\Middleware\RouteMiddleware;
-use ngyuki\Ritz\Middleware\RenderMiddleware;
-use ngyuki\Ritz\Middleware\DispatchMiddleware;
-use ngyuki\Ritz\Router\Resolver;
-use ngyuki\Ritz\Router\Router;
-use ngyuki\Ritz\Dispatcher\ActionInvoker;
-use ngyuki\Ritz\View\RendererInterface;
-use ngyuki\Ritz\View\PhpRenderer;
+use Ritz\Middleware\RouteMiddleware;
+use Ritz\Middleware\RenderMiddleware;
+use Ritz\Middleware\DispatchMiddleware;
+use Ritz\Router\Resolver;
+use Ritz\Router\Router;
+use Ritz\Dispatcher\ActionInvoker;
+use Ritz\View\RendererInterface;
+use Ritz\View\PhpRenderer;
 
 class ContainerFactory
 {
