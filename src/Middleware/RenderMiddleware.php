@@ -4,7 +4,9 @@ namespace Ritz\Middleware;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Ritz\Router\RouteResult;
 use Ritz\View\RendererInterface;
+use Ritz\View\TemplateResolver;
 use Ritz\View\ViewModel;
 
 class RenderMiddleware implements MiddlewareInterface
@@ -14,9 +16,15 @@ class RenderMiddleware implements MiddlewareInterface
      */
     private $renderer;
 
-    public function __construct(RendererInterface $renderer)
+    /**
+     * @var TemplateResolver
+     */
+    private $resolver;
+
+    public function __construct(RendererInterface $renderer, TemplateResolver $resolver)
     {
         $this->renderer = $renderer;
+        $this->resolver = $resolver;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
@@ -25,7 +33,15 @@ class RenderMiddleware implements MiddlewareInterface
 
         if ($response instanceof ViewModel) {
             if ($response->getTemplate() === null) {
-                throw new \LogicException("Missing template in ViewModel ({$request->getUri()})");
+                $result = RouteResult::from($request);
+                if ($result === null) {
+                    throw new \LogicException("Missing template in ViewModel ({$request->getUri()})");
+                }
+                $template = $this->resolver->resolve(get_class($result->getInstance()), $result->getMethod());
+                if ($response->getRelative() !== null) {
+                    $template = dirname($template) . '/' . $response->getRelative();
+                }
+                $response = $response->withTemplate($template);
             }
             $content = $this->renderer->render($response->getTemplate(), $response->getVariables());
             $response->getBody()->write($content);

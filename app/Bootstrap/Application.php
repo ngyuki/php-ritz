@@ -40,12 +40,12 @@ class Application implements MiddlewareInterface
         if ($this->container->get('debug')) {
             $pipeline->pipe(new WhoopsMiddleware());
         }
+        $pipeline->pipe($this->container->get(RouteMiddleware::class));
         $pipeline->pipe($this->container->get(RenderMiddleware::class));
         $pipeline->pipe($this->container->get(ErrorMiddleware::class));
         if ($this->container->get('debug')) {
             $pipeline->pipe(new WhoopsMiddleware());
         }
-        $pipeline->pipe($this->container->get(RouteMiddleware::class));
         $pipeline->pipe($this->container->get(LoginMiddleware::class));
         $pipeline->pipe($this->container->get(DispatchMiddleware::class));
 
