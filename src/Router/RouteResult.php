@@ -16,20 +16,13 @@ class RouteResult
     private $method;
 
     /**
-     * @var string
-     */
-    private $template;
-
-    /**
      * @param object $instance
      * @param string $method
-     * @param string $template
      */
-    public function __construct($instance, $method, $template)
+    public function __construct($instance, $method)
     {
         $this->instance = $instance;
         $this->method = $method;
-        $this->template = $template;
     }
 
     /**
@@ -46,14 +39,6 @@ class RouteResult
     public function getMethod()
     {
         return $this->method;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
     }
 
     /**
