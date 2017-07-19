@@ -1,5 +1,5 @@
 <?php
-namespace App\Middleware;
+namespace Ritz\App\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
@@ -7,8 +7,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 use Ritz\Router\RouteResult;
 use Ritz\View\ViewModel;
-use App\Component\IdentityInterface;
-use App\Controller\LoginController;
+use Ritz\App\Component\IdentityInterface;
+use Ritz\App\Controller\LoginController;
 
 class LoginMiddleware implements MiddlewareInterface
 {

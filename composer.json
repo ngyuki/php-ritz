@@ -22,8 +22,7 @@
     },
     "autoload-dev": {
         "psr-4" : {
-            "App\\": "app/",
-            "FunctionalTest\\": "tests/FunctionalTest/"
+            "Ritz\\App\\": "app/"
         }
     }
 }

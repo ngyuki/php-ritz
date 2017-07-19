@@ -1,10 +1,10 @@
 <?php
-namespace App\Test\Test;
+namespace Ritz\App\Test\Test;
 
-use App\Bootstrap\Application;
-use App\Bootstrap\ContainerFactory;
-use App\Component\IdentityInterface;
-use App\Component\IdentityStab;
+use Ritz\App\Bootstrap\Application;
+use Ritz\App\Bootstrap\ContainerFactory;
+use Ritz\App\Component\IdentityInterface;
+use Ritz\App\Component\IdentityStab;
 use Interop\Container\ContainerInterface;
 use Ritz\Bootstrap\Server;
 use PHPUnit\Framework\TestCase;

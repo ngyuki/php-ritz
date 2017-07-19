@@ -1,5 +1,5 @@
 <?php
-namespace App\Service;
+namespace Ritz\App\Service;
 
 class LoginService
 {

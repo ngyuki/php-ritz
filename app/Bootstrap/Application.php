@@ -1,5 +1,5 @@
 <?php
-namespace App\Bootstrap;
+namespace Ritz\App\Bootstrap;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
@@ -10,8 +10,8 @@ use Ritz\Bootstrap\Server;
 use Ritz\Middleware\DispatchMiddleware;
 use Ritz\Middleware\RenderMiddleware;
 use Ritz\Middleware\RouteMiddleware;
-use App\Middleware\ErrorMiddleware;
-use App\Middleware\LoginMiddleware;
+use Ritz\App\Middleware\ErrorMiddleware;
+use Ritz\App\Middleware\LoginMiddleware;
 use Franzl\Middleware\Whoops\PSR15Middleware as WhoopsMiddleware;
 
 class Application implements MiddlewareInterface

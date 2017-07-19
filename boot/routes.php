@@ -1,10 +1,10 @@
 <?php
-namespace App;
+namespace Ritz\App;
 
 use function DI\value;
 use FastRoute\RouteCollector;
-use App\Controller\HomeController;
-use App\Controller\LoginController;
+use Ritz\App\Controller\HomeController;
+use Ritz\App\Controller\LoginController;
 
 return [
     'app.routes' => value(function(RouteCollector $r) {

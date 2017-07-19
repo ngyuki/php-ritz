@@ -1,11 +1,11 @@
 <?php
-namespace App\Controller;
+namespace Ritz\App\Controller;
 
-use App\Component\IdentityStab;
+use Ritz\App\Component\IdentityStab;
 use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\Response\RedirectResponse;
 use Ritz\View\ViewModel;
-use App\Service\LoginService;
+use Ritz\App\Service\LoginService;
 use Zend\Diactoros\ServerRequestFactory;
 
 class LoginControllerTest extends TestCase

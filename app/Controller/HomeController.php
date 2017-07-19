@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller;
+namespace Ritz\App\Controller;
 
 use Ritz\Exception\HttpException;
 use Zend\Diactoros\Response\TextResponse;

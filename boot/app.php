@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace Ritz\App;
 
 return [
     //'app.cache_dir' => __DIR__ . '/../cache/',

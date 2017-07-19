@@ -1,5 +1,5 @@
 <?php
-namespace App\Component;
+namespace Ritz\App\Component;
 
 interface IdentityInterface
 {
