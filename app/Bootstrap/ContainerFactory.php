@@ -17,7 +17,7 @@ class ContainerFactory
         $env = getenv('APP_ENV');
 
         $files = array_merge(
-            glob(__DIR__ . '/../../boot/*.php'),
+            glob(__DIR__ . '/../../bootstrap/*.php'),
             glob(__DIR__ . "/../../config/$env.php"),
             glob(__DIR__ . '/../../config/local.php')
         );
