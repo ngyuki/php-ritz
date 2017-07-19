@@ -1,5 +1,5 @@
 {
-    "name": "ngyuki/php-ritz",
+    "name": "ngyuki/ritz",
     "type": "library",
     "license": "MIT",
     "require": {
