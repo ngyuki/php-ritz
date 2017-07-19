@@ -2,7 +2,8 @@
 namespace Ritz\App;
 
 return [
-    //'app.cache_dir' => __DIR__ . '/../cache/',
+    'debug' => true,
+    'app.cache_dir' => null,
     'app.view.directory' => dirname(__DIR__) . '/resource/view/',
     'app.view.suffix' => '.phtml',
     'app.view.autoload' => [
