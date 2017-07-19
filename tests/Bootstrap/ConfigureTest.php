@@ -1,5 +1,5 @@
 <?php
-namespace Test\Bootstrap;
+namespace Ritz\Test\Bootstrap;
 
 use PHPUnit\Framework\TestCase;
 use Ritz\Bootstrap\Configure;
