@@ -1,5 +1,5 @@
 <?php
-namespace Ritz\App\Test\Test;
+namespace Ritz\Test\App;
 
 use Ritz\App\Bootstrap\Application;
 use Ritz\App\Bootstrap\ContainerFactory;

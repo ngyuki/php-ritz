@@ -1,5 +1,5 @@
 <?php
-namespace Ritz\App\Controller;
+namespace Ritz\Test\App;
 
 use Ritz\App\Component\IdentityStab;
 use PHPUnit\Framework\TestCase;
@@ -7,6 +7,7 @@ use Zend\Diactoros\Response\RedirectResponse;
 use Ritz\View\ViewModel;
 use Ritz\App\Service\LoginService;
 use Zend\Diactoros\ServerRequestFactory;
+use Ritz\App\Controller\LoginController;
 
 class LoginControllerTest extends TestCase
 {
