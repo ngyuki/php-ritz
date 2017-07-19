@@ -109,48 +109,13 @@ Route と Dispatch の間のミドルウェアで、コントローラーのイ�
 
 ので、Route の段階でコントローラーをインスタンス化する。
 
-## ルーティングで設定するコントローラー名
+## Middleware の並び ... Route -> Render -> Dispatch
 
-`HogeController::class` のようにクラス名を直接指定するようにしたい。
-ただ、コントローラーのクラス名からテンプレートを導出する方法が課題。
+Render -> Route -> Dispatch の並びになっている方が Route で発生したエラー（404 とか）をエラーとして表示しやすい。
+なのでテンプレート名の自動解決は Route でやって VireModel に設定する（Dispatch でもよいけれど）。
 
-例えば `App\Controller\HogeController` なら `app/hoge` にするとか？ ZF2 はこの形式。
-PSR-4 により 名前空間の App はディレクトリに現れないにも関わらず、
-テンプレートでは app ディレクトリが現れるのが微妙？
-トップに `app` `error` `layout` ディレクトリが来るなら自然な気もする？
-（今までは `_layout` みたいに普通のテンプレートのディレクトリと区別してたし）
-
-ZE はコントローラーでテンプレート名を明示するのでそういう問題はない。
-
-コントローラー名からテンプレートディレクトリの解決にも PSR-4 みたいな方法を使う？
-
-```php
-return [
-    'app.view.autoload' => [
-        'App\\Controller\\' => __DIR__ . '/resource/view/',
-    ],
-];
-```
-
-## デフォルトのテンプレート名は誰が設定する？
-
-いま Route ミドルウェアでデフォルトのテンプレート名を設定しているけどこれは妥当？
-
-パイプラインを Route -> Render -> Dispatch の並びにして、
-Route 結果から Render でデフォルトのテンプレート名を使うほうが自然？
-
-その場合、いま RouteResult はコントローラーのインスタンスとメソッド名しか持っていないので、
-そこからテンプレート名を導出すれば良いか？
-
-あるいは RouteResult で $template みたいなプロパティを増やす？
-Route ミドルウェアの役割を次の通りに考えればそんなに不自然でも無い。
-
-「ディスパッチするコントローラー＆メソッドとレンダリングするテンプレートをリクエストから導出する」
-
-ただデフォルトテンプレート名の解決はともかく、
-ViewModel に反映するのは DispatchMiddleware でやったほうが
-コントローラーのユニットテストはやりやすい。
-（getTemplate が null を返す状況を考えなくていいから）
+と思ったけど Route で 404 はそのままパイプラインの次に進むので、Route では基本的にバグ以外でエラーは発生しない。
+なので、Route -> Render -> Dispatch の順番にして、ルータ結果を元に Render でテンプレート名を自動解決する。
 
 ## セッション
 
@@ -217,60 +182,6 @@ return [
 ];
 ```
 
-配列でコントローラーとメソッドを分けているから角括弧で見にくくなっているのだろうか。
-RouteCollector をラップして次のようにしてみる？
-
-```php
-return [
-    'app.routes' => value(function(RouteCollector $r) {
-        $r->get('/', HomeController::class, 'index');
-        $r->get('/view', HomeController::class, 'view');
-        $r->get('/response', HomeController::class, 'response');
-        $r->get('/raise', HomeController::class, 'raise');
-        $r->get('/login', LoginController::class, 'index');
-        $r->post('/login', LoginController::class, 'login');
-        $r->get('/logout', LoginController::class, 'logout');
-        $r->addGroup('/user', function (RouteCollector $r) {
-            $r->get('/{name}', HomeController::class, 'user');
-        });
-    }),
-];
-```
-
-普通に文字列結合でもいい気がする。
-
-```php
-return function(RouteCollector $r) {
-    $r->get('/', HomeController::class . '@index');
-    $r->get('/view', HomeController::class . '@view');
-    $r->get('/response', HomeController::class . '@response');
-    $r->get('/raise', HomeController::class . '@raise');
-    $r->get('/login', LoginController::class . '@index');
-    $r->post('/login', LoginController::class . '@login');
-    $r->get('/logout', LoginController::class . '@logout');
-    $r->addGroup('/user', function (RouteCollector $r) {
-        $r->get('/{name}', HomeController::class . '@user');
-    });
-});
-```
-
-メソッドチェイン？
-
-```php
-return function(RouteCollector $r) {
-    $r->get('/')->controller(HomeController::class)->method('index');
-    $r->get('/view')->controller(HomeController::class)->method('view');
-    $r->get('/response')->controller(HomeController::class)->method('response');
-    $r->get('/raise')->controller(HomeController::class)->method('raise');
-    $r->get('/login')->controller(LoginController::class)->method('index');
-    $r->post('/login')->controller(LoginController::class)->method('login');
-    $r->get('/logout')->controller(LoginController::class)->method('logout');
-    $r->addGroup('/user', function (RouteCollector $r) {
-        $r->get('/{name}')->controller(HomeController::class)->method('@user');
-    });
-});
-```
-
 こんな風にグループ化できると良いかも？
 
 ```php
@@ -291,6 +202,20 @@ return function(RouteCollector $r) {
         })
     ;
 });
+```
+
+そういうのは独自の RouteCollector を実装すれば良いわけなので、フレームワークとしては現状のままで良い。
+
+↓みたいなメソッドシグネチャを持つ RouterInterface を設けるのでも良い？
+
+```php
+/**
+ * @param string $method
+ * @param string $uri
+ * @return array [string $controller, string $action, array $params]
+ */
+
+public function route($method, $uri);
 ```
 
 ## コンフィグファイルのキャッシュ
@@ -347,48 +272,20 @@ return (new Configure())
 - Debug クラスを作ってオートワイヤリングで DI する
     - それだけのために Debug クラスなんてのを作るのは過剰な気がする
 - Config みたいなフレームワークの基本的なコンフィグを持つクラスを作る
+- そもそもデバッグフラグみたいなので動作を変えるべきではない
+    - オブジェクトの属性とかで振る舞いを制御すべき
 
-## Factory と Interface
+## Server が debug 使っているのが微妙な気がする
 
-フレームワークを構成するクラスは Factory と Interface も用意しておくことで、PHP-DI 以外の DI コンテナでも使いやすくする？
+Server クラスで下記の２つのために debug フラグを使っている。
 
-全部に Factory を作るのは過剰な気もするので、ContainerFactory を PHP-DI の記法ではなくクロージャーを用いたファクトリを使うことでコピペで別のコンテナのファクトリを作りやすくする。
-
-ミドルウェアについてはインタフェースにする意味があんまりない。MiddlewareInterface なので。インタフェースを作ったとしても DI のエントリの ID にするぐらいしか使い道は無い。
-
-## Server もコンテナに入れる？
-
-```php
-$server = new Server();
-$server->run($container->get(Application::class), $container->get('debug'));
-```
-
-みたいなコードがちょっと微妙な感じする。
-
-```php
-/* app.php */
-return [
-    'debug' => true,
-    'app.class' => Application::class,
-];
-
-/* index.php */
-$container->get(Server::class)->run();
-
-/* ContainerFactory.php */
-return [
-    Server::class => function ($container) {
-        return new Server(
-            $container->get($container->get(Application::class)),
-            $container->get('debug')
-        );
-    },
-];
-```
-
-`'app.class'` は無くてもいいかな？
-
-```php
-/* index.php */
-$container->get(Server::class)->run(Application::class);
-```
+- エラーレスポンスの表示
+    - 例外をキャッチしてエラーページを表示する
+    - アプリでハンドリングするだろうし無くていい気がする
+- var_dump とかの内容を直接表示する
+    - デフォだと SapiEmitter が Content-Length を設定する
+    - そのため直接出力するとレスポンスのサイズがずれておかしなことになる
+    - デバッグ時は直接出力されたらそれをそのまま表示するようにしている
+    - 直接出力は例外にするとか？
+        - プロダクションなら真っ白
+        - 開発なら例外の表示と出力内容
