@@ -26,162 +26,80 @@
 
 一般的なフレームワークのコントローラーは多くのオブジェクトに依存している重量級であるのに対して、このフレームワークのコントローラーは超軽量です。そのため、コントローラーのユニットテストも容易に可能です。
 
-## index.php
+## サンプルアプリ
 
-典型的な index.php は下記のような形です。
+次のコマンドでサンプルアプリが実行できます。
 
-```php
-<?php
-namespace App;
-
-use Ritz\Bootstrap\Configure;
-use Ritz\Bootstrap\ContainerFactory;
-use Ritz\Bootstrap\Server;
-
-require __DIR__  . '/../vendor/autoload.php';
-
-// 環境変数
-$env = getenv('APP_ENV');
-
-// アプリケーションのコンフィグファイルのリスト
-$files = array_merge(
-    glob(__DIR__ . '/../boot/*.php'),
-    glob(__DIR__ . "/../config/$env.php"),
-    glob(__DIR__ . '/../config/local.php')
-);
-
-// コンフィグファイルの読み込み
-$config = (new Configure())->init($files);
-
-// コンフィグを元にコンテナを作成
-$container = (new ContainerFactory())->create($config);
-
-// コンテナからアプリケーションオブジェクトとデバッグフラグを取り出してサーバを実行する
-$server = new Server()
-$server->run($container->get(Application::class), $container->get('debug'));
+```sh
+conposer install
+php -S 0.0.0.0:8888
+open http://localhost:8888/
 ```
 
-example ではこれらの処理を Bootstrap クラスにまとめているため index.php は下記だけしかありません。
+### ディレクトリ構造
 
-```php
-require __DIR__  . '/../vendor/autoload.php';
-App\Bootstrap::main();
+サンプルアプリは次のディレクトリ構造になっています。
+
+- app/
+    - オートロードされる PHP クラスを格納するディレクトリ
+- bootstrap/
+    - DI コンテナの初期化のためのコードを格納するディレクトリ
+    - 環境依存しない初期化の設定を格納します
+- cache/
+    - キャッシュファイルを書き込むディレクトリ
+- config/
+    - DI コンテナの初期化のためのコードを格納
+    - 環境依存のアプリの設定ファイルを格納します
+- public/
+    - サーバのドキュメントルートに設定するディレクトリ
+- resource/
+    - ビューのテンプレートファイルなどを格納するディレクトリ
+- tests/App/
+    - アプリケーションのテストコード
+
+### ネームスペース構造
+
+サンプルアプリのネームスペースは次の構造になっています。
+
+- Ritz\App\Bootstrap
+    - アプリケーションクラスやコンテナファクトリなどのアプリの初期化で使用されるクラス
+- Ritz\App\Component
+    - Controller や Service で使用されるその他のコンポーネントクラスが格納されます
+- Ritz\App\Controller
+    - アプリのコントローラークラスが格納されます
+- Ritz\App\Middleware
+    - アプリで独自に使用する PSR-15 Middleware が格納されます
+- Ritz\App\Service
+    - アプリのユースケースを実装するサービスクラスを格納します
 ```
 
-## コンフィグファイル
+### 処理の流れ
 
-コンフィグファイルでは DI の定義を行います。
+サンプルアプリは次の流れで処理されます。
 
-例えば下記のようになります。
+- `ContainerFactory` がコンテナを作成する
+    - `Configure` クラスが `bootstrap/` と `config/` から DI コンテナの初期化のコードを読む
+    - `config/` からは環境変数 `APP_ENV` に基づいたファイルも読まれる
+    - ルート定義も `bootstrap/` に含まれている
+- コンテナから `Application` クラスのオブジェクトを取り出す
+- `Application` オブジェクトを `Server::run` クラスに渡してアプリケーションを実行する
+- `Application` が PSR-15 Middleware として実行される
+    - 実行時にパイプラインを構築する
+- パイプラインが順番に実行される
 
-**app.php**
-
-```php
-return [
-    'app.cache_dir' => __DIR__ . '/../cache/',
-    'app.view.directory' => dirname(__DIR__) . '/resource/view/',
-    'app.view.suffix' => '.phtml',
-];
-```
-
-**routes.php**
-
-```php
-return [
-    'app.routes' => DI\value(function(RouteCollector $r) {
-        $r->get('/', [HomeController::class, 'index']);
-    });
-];
-```
-
-**service.php**
-
-```php
-return [
-    HelloService::class => DI\object(HelloService::class)),
-];
-```
-
-複数のファイルに分割して記述されていますが、これらのファイルの内容は `Configure` クラスによってマージされます。
-
-標準のコンテナのファクトリである `ContainerFactory` は PHP-DI のコンテナを作成するため、コンフィグファイルは PHP-DI の記述に則る必要があります。詳細は PHP-DI のドキュメントを参照してください。
-
-## デフォルトのコンテナファクトリとコンフィグのエントリ
-
-`ContainerFactory` ではいくつかのオブジェクトがデフォルトで定義されています。これらのオブジェクトは下記に示す幾つかのエントリに依存しているため、アプリケーションのコンフィグでこれらを定義する必要があります。
-
-```php
-return [ 
-    // キャッシュディレクトリ
-    // オプショナルで未指定や null ならキャッシュは使用されない
-    'app.cache_dir' => __DIR__ . '/../cache/',
-
-    // テンプレートファイルのディレクトリ
-    'app.view.directory' => dirname(__DIR__) . '/resource/view/',
-
-    // テンプレートファイルの拡張子
-    'app.view.suffix' => '.phtml',
-
-    // ルート定義
-    'app.routes' => value(function(RouteCollector $r) {
-        $r->get('/', [HomeController::class, 'index']);
-    });
-];
-```
+サンプルアプリの幾つかのコードには詳細なコメントが記述されているため、アプリケーション構成の参考にしてください。
 
 ## Application クラス
 
-`Application` クラスは PSR-15 の `MiddlewareInterface` を実装する必要があります。
+`Application` クラスは PSR-15 の `MiddlewareInterface` を実装し、`process` メソッドでパイプラインを初期化して実行する必要があります。
 
-典型的な `Application` クラスの実装は下記のようになります。
+下記の 3 つのミドルウェアはフレームワークが提供する基本的なミドルウェアで、基本的には必須です（もちろん独自のミドルウェアに差し替えることも出来ます）。
 
-```php
-class Application implements MiddlewareInterface
-{
-    private $container;
+- `RenderMiddleware`
+- `RouteMiddleware`
+- `DispatchMiddleware`
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        $pipeline = new MiddlewarePipe();
-        $pipeline->pipe($this->container->get(RenderMiddleware::class));
-        $pipeline->pipe($this->container->get(RouteMiddleware::class));
-        $pipeline->pipe($this->container->get(DispatchMiddleware::class));
-        return $pipeline->process($request, $delegate);
-    }
-}
-```
-
-この例では３つのミドルウェアでパイプラインを作成しています。基本的にこの３つのミドルウェアは Web アプリとして振る舞うために必須です。必要に応じでアプリケーション独自のミドルウェアを追加します。
-
-例えば、下記のようにルーティングとディスパッチの間にミドルウェアを挿し込むことができます。
-
-```php
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        $pipeline = new MiddlewarePipe();
-        $pipeline->pipe($this->container->get(RenderMiddleware::class));
-        $pipeline->pipe($this->container->get(RouteMiddleware::class));
-
-        $pipeline->pipe(function (ServerRequestInterface $request, DelegateInterface $delegate) {
-            // Pre dispatch
-            $response = $delegate->process($request);
-            // Post dispatch
-            return $response;
-        });
-
-        $pipeline->pipe($this->container->get(DispatchMiddleware::class));
-        return $pipeline->process($request, $delegate);
-    }
-```
-
-ミドルウェアは後段ミドルウェアの前と後の両方を処理することができます。この例ではいわゆる PreDispatch と PostDispatch の両方を１つのミドルウェアで処理しています。
-
-ミドルウェアのユースケースには下記のようなものが考えられます。
+必要に応じて、アプリケーション独自のミドルウェアをパイプラインの任意の場所に差し込むことができます。例えば、次のようなアプリケーション独自パイプラインが考えられます。
 
 - 例外発生時に特定のテンプレート選択する
 - CSRF トークンのチェックを行う
@@ -190,7 +108,7 @@ class Application implements MiddlewareInterface
 
 ## ルート定義
 
-ルート定義は下記のようになります。
+ルート定義は下記のようになります。ルーターの実装には `FastRoute` を使用しているため、具体的なルート定義の方法は `FastRoute` のドキュメントを参照してください。
 
 ```php
 use function DI\value;
@@ -206,11 +124,7 @@ return [
 ];
 ```
 
-ルーターの実装には `FastRoute` を使用しているため、具体的なルート定義の方法は `FastRoute` のドキュメントを参照してください。
-
 ルートのハンドラ（`get` メソッドの第２引数）にはコントローラー名とアクション名からなる配列を指定します。コントローラー名は DI コンテナからコントローラーインスタンスを取り出す際のエントリ名です（典型的にはコントローラーのクラス名）。アクション名はコントローラーのメソッド名です。
-
-この例では、`GET /` というルートで DI コンテナの `HomeController::class` エントリからコントローラーのインスタンスが取り出されて `indexAction` メソッドが実行されます。
 
 ## アクションメソッドの引数
 
@@ -281,7 +195,7 @@ return (new ViewModel())->withTemplate('App/Home/index');
 自動的に導出されたテンプレート名に対して相対でテンプレートを指定することができます。例えば自動的に導出されたテンプレート名が `App/Home/index` の場合、下記のコードではテンプレート名が `App/Home/edit` となります。
 
 ```php
-return (new ViewModel())->withRelative('edit');
+return (new ViewModel())->withTemplate('./edit');
 ```
 
 `ViewModel` は PSR-15 の `ResponseInterface` を実装しています。ステータスコードやレスポンスヘッダを加工したいときは `ResponseInterface` のメソッドが使用できます。
@@ -310,49 +224,28 @@ return new TextResponse("hello");
 
 ## テンプレート名の自動的な解決
 
-`ViewModel` でテンプレート名が指定されていない場合、デフォルトではコントローラーのクラス名とアクションメソッド名を元にしたテンプレート名が使用されます。
+`ViewModel` でテンプレート名が指定されていない場合、`RenderMiddleware` のコンストラクタに渡された `TemplateResolver` がコントローラーのクラス名とアクションメソッド名を元にテンプレート名が導出されます。
 
-- コントローラーの名前空間から `Controller` というセグメントを除去
+`TemplateResolver` はコンストラクタで、コントローラーの名前空間とテンプレートのプレフィックスのマッピングの配列を受け取ります。例えば、次のように `TemplateResolver` のインスタンスを設定します。
+
+```php
+return [
+    'app.view.autoload' => [
+        'Ritz\\App\\Controller\\' => 'App/',
+    ],
+    TemplateResolver::class => function (ContainerInterface $container) {
+        return new TemplateResolver($container->get('app.view.autoload'));
+    },
+];
+```
+
+`app.view.autoload` は Composer の PSR-4 のオートローダーの設定に似ています。上の設定では `Ritz\\App\\Controller\\` という名前空間のプレフィックスは `App/` というテンプレート名に置換されます。
+
+さらに、クラス名とメソッド名に次の加工が施されて、テンプレート名が導出されます。
+
 - コントローラーのクラス名のサフィックスが `Controller` なら除去
 - アクションメソッドのサフィックスが `Action` なら除去
 - 名前空間区切りはディレクトリ区切りに置き換わる
 - コントローラー名とアクションメソッド名はディレクトリ区切りで結合される
 
-例えば `App\Controller\HomeController::indexAction` というクラス名・メソッド名であれば、テンプレートは `App/Home/index` となります。
-
-## コントローラーでミドルウェアを実装 → 廃止
-
-コントローラーで PSR-15 の `MiddlewareInterface` を実装すると、アクションの前段のミドルウェアとしてコントローラー自身が組み込まれます。これはコントローラーごとの Pre/PostDispatch として使用できます。
-
-```php
-class HomeController implements MiddlewareInterface
-{
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-    {
-        // ... Pre Dispatch ...
-
-        $response = $delegate->process($request);
-
-        // ... Post Dispatch ...
-
-        return $response;
-    }
-}
-```
-
-**※廃止**
-
-もしそういうことがやりたければそういう Middleware を作ると良いです。
-
-```php
-public function process(ServerRequestInterface $request, DelegateInterface $delegate)
-        $instance = RouteResult::from($request)->getInstance();
-        if ($instance instanceof MiddlewareInterface) {
-            $pipeline = new MiddlewarePipe();
-            $pipeline->pipe($instance);
-            return $pipeline->process($request, $delegate);
-        }
-        return $delegate->process($request);
-    }
-}
-```
+例えば `Ritz\App\Controller\HomeController::indexAction` というクラス名・メソッド名であれば、テンプレートは `App/Home/index` となります。
