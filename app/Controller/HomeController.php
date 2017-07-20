@@ -30,7 +30,7 @@ class HomeController
     public function relativeAction()
     {
         return (new ViewModel())
-            ->withRelative('relative-template')
+            ->withTemplate('./relative-template')
             ->withVariable('msg', "テンプレート名を相対で指定する");
     }
 

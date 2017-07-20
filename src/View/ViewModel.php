@@ -11,11 +11,6 @@ class ViewModel extends HtmlResponse
     private $template;
 
     /**
-     * @var string
-     */
-    private $relative;
-
-    /**
      * @var array
      */
     private $variables = [];
@@ -37,18 +32,6 @@ class ViewModel extends HtmlResponse
     public function getTemplate()
     {
         return $this->template;
-    }
-
-    public function withRelative($relative)
-    {
-        $new = clone $this;
-        $new->relative = $relative;
-        return $new;
-    }
-
-    public function getRelative()
-    {
-        return $this->relative;
     }
 
     public function withVariables(array $variables)
