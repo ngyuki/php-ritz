@@ -83,4 +83,14 @@ class ApplicationTest extends TestCase
         $document = new Document($response->getBody()->getContents());
         self::assertContains('relative-template.phtml', $this->query($document, '#file')->textContent);
     }
+
+    function test_notfound()
+    {
+        $container = $this->initWithIdentity();
+
+        $request = $this->createRequest('http://localhost/notfound');
+        $response = $this->handle($request, $container);
+
+        self::assertEquals(404, $response->getStatusCode());
+    }
 }
