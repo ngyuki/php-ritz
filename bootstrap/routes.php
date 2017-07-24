@@ -7,7 +7,9 @@ use Ritz\App\Controller\HomeController;
 use Ritz\App\Controller\LoginController;
 
 return [
+    // ルートの定義
     'app.routes' => value(function(RouteCollector $r) {
+
         $r->get('/',          [HomeController::class, 'indexAction']);
         $r->get('/view',      [HomeController::class, 'viewAction']);
         $r->get('/response',  [HomeController::class, 'responseAction']);
