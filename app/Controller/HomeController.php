@@ -1,7 +1,6 @@
 <?php
 namespace Ritz\App\Controller;
 
-use Ritz\Exception\HttpException;
 use Zend\Diactoros\Response\TextResponse;
 use Ritz\View\ViewModel;
 
@@ -39,12 +38,7 @@ class HomeController
         return new TextResponse("アクションから Response オブジェクトを直接返す");
     }
 
-    public function forbiddenAction()
-    {
-        throw new HttpException(null, 403);
-    }
-
-    public function raiseAction()
+    public function errorAction()
     {
         throw new \RuntimeException("例外です");
     }

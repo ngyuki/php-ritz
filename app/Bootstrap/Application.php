@@ -6,7 +6,6 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Stratigility\MiddlewarePipe;
-use Ritz\Bootstrap\Server;
 use Ritz\Middleware\DispatchMiddleware;
 use Ritz\Middleware\RenderMiddleware;
 use Ritz\Middleware\RouteMiddleware;

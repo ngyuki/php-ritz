@@ -13,9 +13,8 @@ return [
         $r->get('/',          [HomeController::class, 'indexAction']);
         $r->get('/view',      [HomeController::class, 'viewAction']);
         $r->get('/response',  [HomeController::class, 'responseAction']);
-        $r->get('/raise',     [HomeController::class, 'raiseAction']);
+        $r->get('/error',     [HomeController::class, 'errorAction']);
         $r->get('/relative',  [HomeController::class, 'relativeAction']);
-        $r->get('/error/403', [HomeController::class, 'forbiddenAction']);
 
         $r->get('/login',    [LoginController::class, 'indexAction']);
         $r->post('/login',   [LoginController::class, 'loginAction']);

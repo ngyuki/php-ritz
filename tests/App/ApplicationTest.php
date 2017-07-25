@@ -51,7 +51,10 @@ class ApplicationTest extends TestCase
         return $response;
     }
 
-    function test_redirect_login()
+    /**
+     * @test
+     */
+    function redirect_login()
     {
         $request = $this->createRequest('http://localhost/');
         $response = $this->handle($request);
@@ -60,7 +63,10 @@ class ApplicationTest extends TestCase
         self::assertEquals('/login', $response->getHeaderLine('Location'));
     }
 
-    function test_top()
+    /**
+     * @test
+     */
+    function top_()
     {
         $container = $this->initWithIdentity();
 
@@ -71,7 +77,10 @@ class ApplicationTest extends TestCase
 
     }
 
-    function test_relativeTemplate()
+    /**
+     * @test
+     */
+    function relative_template()
     {
         $container = $this->initWithIdentity();
 
@@ -84,7 +93,10 @@ class ApplicationTest extends TestCase
         self::assertContains('relative-template.phtml', $this->query($document, '#file')->textContent);
     }
 
-    function test_notfound()
+    /**
+     * @test
+     */
+    function notfound_()
     {
         $container = $this->initWithIdentity();
 
@@ -92,5 +104,18 @@ class ApplicationTest extends TestCase
         $response = $this->handle($request, $container);
 
         self::assertEquals(404, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    function error_()
+    {
+        $container = $this->initWithIdentity();
+
+        $request = $this->createRequest('http://localhost/error');
+        $response = $this->handle($request, $container);
+
+        self::assertEquals(500, $response->getStatusCode());
     }
 }

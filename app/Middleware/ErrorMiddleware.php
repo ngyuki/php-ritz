@@ -3,10 +3,10 @@ namespace Ritz\App\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use Ritz\Exception\HttpException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ritz\View\ViewModel;
+use Zend\Diactoros\Response;
 
 class ErrorMiddleware implements MiddlewareInterface
 {
@@ -25,15 +25,11 @@ class ErrorMiddleware implements MiddlewareInterface
         try {
             return $delegate->process($request);
         } catch (\Exception $ex) {
-            if ($ex instanceof HttpException === false) {
-                $ex = new HttpException();
-            }
-            $response = (new ViewModel())
+            $message = (new Response())->withStatus(500)->getReasonPhrase();
+            return (new ViewModel())
+                ->withVariable('message', $message)
                 ->withTemplate('Error/error')
-                ->withVariable('message', $ex->getMessage())
-                ->withStatus($ex->getCode())
-            ;
-            return $response;
+                ->withStatus(500);
         }
     }
 }
