@@ -2,56 +2,11 @@
 
 PSR-7(HTTP Message Interface) とか PHR-15(HTTP Middlewares) とか。
 
-## 主要なフレームワークで使われているリクエスト/レスポンスクラス
+## アクションの戻り値は ViewModel にしてコントローラーをレンダラに依存させない
 
-- zend-expressive
-    - zend-diactoros
-        - https://github.com/zendframework/zend-expressive/blob/master/src/Application.php#L503-L514
-- symfony-httpfoundation
-    - 独自（非 PSR-7）
-        - https://github.com/symfony/http-foundation/blob/master/Request.php
-        - https://github.com/symfony/http-foundation/blob/master/Response.php
-    - PSR-7 のブリッジはある
-        - https://github.com/symfony/psr-http-message-bridge
-        - 相互変換できるだけっぽい
-        - 変換する先は zend-diactoros
-- relayphp
-    - PSR-7 にしか依存しない
-        - https://github.com/relayphp/Relay.Relay/blob/1.x/src/Runner.php
-    - zend-diactoros が基本っぽい
-        - https://github.com/relayphp/Relay.Relay/blob/1.x/tests/RunnerTest.php
-- stackphp
-    - symfony-httpkernel 経由で symfony-httpfoundation
-        - https://github.com/stackphp/run/blob/master/src/Stack/run.php
-- slim
-    - 独自に PSR-7 を実装
-        - https://github.com/slimphp/Slim/blob/3.x/Slim/Http/Request.php
-        - https://github.com/slimphp/Slim/blob/3.x/Slim/Http/Response.php
-- laravel
-    - symfony/http-foundation
-        - https://github.com/laravel/framework/blob/5.4/src/Illuminate/Http/Request.php
-        - https://github.com/laravel/framework/blob/5.4/src/Illuminate/Http/Response.php
-- cakephp
-    - 独自に PSR-7 を実装
-        - https://github.com/cakephp/cakephp/blob/master/src/Http/ServerRequest.php
-        - https://github.com/cakephp/cakephp/blob/master/src/Http/Response.php
-    - ただし zend-diactoros の MessageTrait とかは使っている
-- aura
-    - 独自（非 PSR-7）
-        - https://github.com/auraphp/Aura.Http/blob/1.x/src/Aura/Http/Message/Request.php
-        - https://github.com/auraphp/Aura.Http/blob/1.x/src/Aura/Http/Message/Response.php
-- bear.sunday
-    - 独自っぽい
-        - https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/Request.php
-        - https://github.com/bearsunday/BEAR.Sunday/blob/1.1.0/src/Provide/Transfer/HttpResponder.php
-        - https://github.com/bearsunday/BEAR.Resource/blob/1.x/src/ResourceObject.php
-    - そもそもリクエスト/レスポンスの考え方からして独特
+アクションの戻り値を Response にする場合、アクションの中でテンプレートのレンダリングが必要で、コントローラーがレンダラに依存してしまう。
 
-## Action の戻り値は ViewModel にしてコントローラーがレンダラに依存しないようにする
-
-アクションの戻り値を Response にする案が考えられるが、それだとアクションの中でテンプレートのレンダリングが必要で、コントローラーがレンダラに依存することになってしまう。
-
-アクションはほとんどのケースで決まった名前のテンプレートに変数をアサインして表示するだけなので、アサインする変数の連想配列を返すだけで十分。
+アクションはほとんどのケースで、コントローラー名とアクション名から導出されるテンプレートに変数をアサインして表示するだけなので、アサインする変数の連想配列を返すだけで十分。
 
 ただ、下記のようなケースはありえる
 
@@ -59,50 +14,42 @@ PSR-7(HTTP Message Interface) とか PHR-15(HTTP Middlewares) とか。
 - レスポンスヘッダを弄りたい
 - ビューを表示せずに直接レスポンスを返したい
 
-なので ZF2 のように ViewModel を返すことにして、アクションの呼び出し元で ViewModel を元にレンダリングを行う。
-いちいち ViewModel を作るのもめんどいので配列を返せば自動で ViewModel が作られるようにする。
+なので ZF2 のように ViewModel を返すようにして、アクションの呼び出し元で ViewModel を元にレンダリングを行う。
 
-ViewModel もまた Response を実装することで、レンダリングはミドルウェアで実装する。
+さらに、ViewModel もまた Response を実装することで、レンダリングはそれ用のミドルウェアで実装する。
 
-Response が ViewModel であればレンダリングした結果を withBody する。Response が ViewModel で無ければ何もしない（アクションからレスポンスを直接返したいとき）。テンプレート名も ViewModel に含んでいて、もし未指定ならデフォルトのテンプレート名が使用される（コントローラー名＋アクション名）。
+- アクションが が Body が空の ViewModel を返す
+- 上位のミドルウェアでレスポンスが ViewModel ならレンダリングした結果を withBody する
 
-## Application/Controller は継承なしで実装できる前提
+## Application/Controller は継承を前提にしない
 
 Application/Controller はなるべく継承しない。継承前提だとコンストラクタインジェクションで DI しにくい。
 
 継承元の抽象クラスでコンストラクタを実装しないという案は考えられるけど、それならトレイトで十分。
 
-継承で実現していた TemplateMethod パターンによるフックポイントをどう代替するかが課題だが、下記を設ける。
+継承で実現していた TemplateMethod パターンによるフックポイントをどう代替するかが課題だが、ミドルウェアのパイプラインを代替として使用する。
 
-- アプリケーションでパイプラインを自由に構築できる
-    - プラグイン/アクションヘルパ/継承元コントローラーの Pre/PostDispatch に相当
+## Forward は実装しない
 
-アプリケーションクラスでパイプラインを作る必要があるのがちょっと手間かもしれない。
-
-## Forward は実装が難しいので使用しない
+PSR-15 と、いわゆる Forward は相性が悪い。次のようにしてできると思ったけど・・・
 
 - Action で ForwardException とかを発破する
 - RouteMiddleware の直上の Middleware でキャッチする
 - Request の URI を書き換えてパイプラインを再実行する
 
-とかでできるかと思ったけど `$delegate` はパイプラインのキューを実行毎に unshift していく実装なので、
-２回実行することができない。
+`$delegate` はパイプラインを `SplQueue` で持っていて、実行毎に `unshif`t していく実装なので、同じ `$delegate` を 2 回実行できない。
 
-なので、例外発生時に ErrorController に forward したりができない。
+## エラーのハンドリングはミドルウェアでやる
 
-Forward を使用しない前提で考える。
-
-## エラーのハンドリング
-
-エラーのハンドリングに ZF1 みたいに ErrorController を使うと forward が必要になって面倒。
+エラーのハンドリングに ZF1 みたいに ErrorController を使うと forward が必要になる。
 
 そもそもエラー時にやることなんてせいぜいエラー画面表示するだけ。ZE の skeleton だとテンプレートを表示するだけの実装になっていたりするし。
 
-今、アクションは ViewModel をレスポンスとして返して、ミドルウェアでレンダリングしているので、レンダリングの下のミドルウェアで try/catch して ViewModel でエラーのテンプレートを指定して返す。
+今、アクションは ViewModel をレスポンスとして返して、レンダリング用のミドルウェアでレンダリングしているので、レンダリングの下のミドルウェアで try/catch して ViewModel でエラーのテンプレートを指定して返す。
 
 この方法の問題はレンダリングの段階で発生したエラーはハンドリング出来ないこと。ただ、これはアプリケーションでパイプラインの作り方でどうとでもなる。エラーハンドラのミドルウェアをレンダリングの上にして、エラーハンドラでパイプラインを作って実行すれば良い。
 
-## コントローラーのロードはルーターでやる。
+## コントローラーのロードはルーターでやる
 
 Route と Dispatch の間のミドルウェアで、コントローラーのインスタンスを instanceof とかしたい。
 というのも、その位置のミドルウェアを ZF1 の Pre/PostDispatch のように使いたいため。
@@ -111,26 +58,26 @@ Route と Dispatch の間のミドルウェアで、コントローラーのイ�
 
 ## Middleware の並び ... Route -> Render -> Dispatch
 
-Render -> Route -> Dispatch の並びになっている方が Route で発生したエラー（404 とか）をエラーとして表示しやすい。
-なのでテンプレート名の自動解決は Route でやって VireModel に設定する（Dispatch でもよいけれど）。
+Render -> Route -> Dispatch の並びだと、Route で発生したエラー（404 とか）をエラーとして表示しやすいので、テンプレート名の自動解決は Route でやって VireModel に設定して Render に渡すようにしようと思った。
 
-と思ったけど Route で 404 はそのままパイプラインの次に進むので、Route では基本的にバグ以外でエラーは発生しない。
-なので、Route -> Render -> Dispatch の順番にして、ルータ結果を元に Render でテンプレート名を自動解決する。
+けど、Route は 404 でも次のパイプラインに進むので、Route では基本的にバグ以外で例外は発生しない。
+なので、Route -> Render -> Dispatch の順番にして、ルート結果を元に Render でテンプレート名を自動解決する。
 
-## セッション
+## セッションはフレームワークに含めない
 
-- zend-session はユニットテストのためのスタブ的なのが標準で用意されていない？
+好きなものをアプリで使えば良い。
+
+- zend-session はユニットテストのためのスタブ的なのが標準で用意されていない
     - `runInSeparateProcess` でどうにかすることも出来なくはないが・・
-    - 直接セッションに依存しないよにすればいいのだけどうーん
-- symfony はセッションが http-foundation に含むのが微妙
+    - セッションに直接依存しないようにすれば良い
+- symfony はセッションが http-foundation に含まれていて微妙
 - laravel のセッションは依存でかすぎ
-- aura/session もユニットテストのためのスタブみたいなのなさ気な気がする
+- aura/session もユニットテストのためのスタブみたいなものはなさそう
     - むしろ無いのが普通？
 
 ## PSR のリクエストオブジェクトがショボい件
 
-仕方がないことだけど PSR-7 の ServerRequestInterface をそのまま使うと、
-Symfony とかと比べてショボさ感じる。
+PSR-7 の ServerRequestInterface をそのまま使うと、Symfony とかと比べてショボさ感じる。
 リクエストメソッドのチェックとかクエリパラメータの取得とか。
 
 ```php
@@ -147,10 +94,17 @@ if ($request->isMethod('POST'))) {
 }
 ```
 
-アクションの引数にはリクエストのアトリビュートを元に DI されるので、
-ディスパッチャーの前段のミドルウェアでラップしたオブジェクトを入れる？
+アクションの前段のミドルウェアでリクエストのアトリビュートにラップしたリクエストを入れれば、アクションでそれを使うことができる。
 
-アクションの Invoker を継承してアトリビュートを追加する？
+```php
+public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+{
+    $request = $request->withAttribute(UsefulRequest::class, new UsefulRequest($request));
+    return $delegate->process($request);
+}
+```
+
+あるいは ActionInvoker を継承してアトリビュートを追加しても良い。
 
 ```php
 public function invoke(ServerRequestInterface $request, DelegateInterface $delegate, $instance, $method)
@@ -160,10 +114,9 @@ public function invoke(ServerRequestInterface $request, DelegateInterface $deleg
 }
 ```
 
-## ルーティング
+## ルーティングが書きにくい？
 
-ルーティングが書きにくい気がする。。。
-無理にインデントを揃えようとするから？
+ルーティングが書きにくい気がする。。。無理にインデントを揃えようとするから？
 
 ```php
 return [
@@ -218,51 +171,14 @@ return function(RouteCollector $r) {
 public function route($method, $uri);
 ```
 
-## コンフィグファイルのキャッシュ
+## コンフィグファイルのキャッシュをどうする？
 
 glob は多分遅いのでファイル名をキャッシュするといいと思うんだけど、
-キャッシュするかの設定をコンフィグファイルに書くので、鶏卵になってしまう。
+キャッシュの設定をコンフィグファイルに書くので、鶏卵になってしまう。
 
-例えば Bootstrap.php は固定で特定のファイルを読んで、そこにキャッシュの設定がある前提にする？
+プロダクションでしか必要ないものだし、あらかじめ一覧を `config/config-files.php` とかにビルドするような仕組みでも設ける？ のも過剰な気がするし、なくていいか。
 
-```php
-$config = require __DIR__ . '/../bootstrap/app.php';
-return (new Configure())
-    ->useCache($config['app.config.cache_dir'] ?? null)
-    ->init(function(){
-        $env = getenv(APP_ENV);
-        return array_merge(
-            glob(__DIR__ . '/../bootstrap/*.php'),
-            glob(__DIR__ . '/../config/default.php'),
-            glob(__DIR__ . '/../config/local.php')
-        );
-    })
-;
-```
-
-`app.php` が２回読まれるけど、別に良い？
-次のように最初に読むファイルも Configure に読ませて重複排除する？
-
-```php
-return (new Configure())
-    ->load(__DIR__ . '/../bootstrap/app.php')
-    ->useCache(function ($config){
-        return $config['app.config.cache_dir'] ?? null;
-    })
-    ->load(function(){
-        $env = getenv(APP_ENV);
-        return array_merge(
-            glob(__DIR__ . '/../bootstrap/*.php'),
-            glob(__DIR__ . '/../config/default.php'),
-            glob(__DIR__ . "/../config/$env.php"),
-            glob(__DIR__ . '/../config/local.php')
-        );
-    })
-    ->get()
-;
-```
-
-## デバッグフラグ
+## デバッグフラグをどうやってインジェクションする？
 
 デバッグフラグはいろいろな場所で見たいことがあると思うけど、
 いちいち DI 定義するのはめんどくさすぎる・・・
@@ -275,17 +191,16 @@ return (new Configure())
 - そもそもデバッグフラグみたいなので動作を変えるべきではない
     - オブジェクトの属性とかで振る舞いを制御すべき
 
-## Server が debug 使っているのが微妙な気がする
+## TemplateResolver で PSR-4 みたいにテンプレート名を解決するの必要？
 
-Server クラスで下記の２つのために debug フラグを使っている。
+マルチモジュールのようにするのであれば別だけど、大抵の場合は下記の規則で十分。
 
-- エラーレスポンスの表示
-    - 例外をキャッチしてエラーページを表示する
-    - アプリでハンドリングするだろうし無くていい気がする
-- var_dump とかの内容を直接表示する
-    - デフォだと SapiEmitter が Content-Length を設定する
-    - そのため直接出力するとレスポンスのサイズがずれておかしなことになる
-    - デバッグ時は直接出力されたらそれをそのまま表示するようにしている
-    - 直接出力は例外にするとか？
-        - プロダクションなら真っ白
-        - 開発なら例外の表示と出力内容
+- コントローラーの名前空間の `Controller` というセグメントを除去
+- コントローラーのクラス名のサフィックスが `Controller` なら除去
+- アクションメソッドのサフィックスが `Action` なら除去
+- 名前空間区切りはディレクトリ区切りに置換
+- コントローラー名とアクションメソッド名をディレクトリ区切りで結合
+
+e.g.) `App\Controller\HomeController::indexAction` -> `App\Home\index`
+
+もともとサンプルアプリで名前空間を `Ritz\App` にしたときにテンプレートディレクトリの階層が深くなるのが嫌だっただけ。なので、これ以外の規則が必要になったときに拡張するとかで十分だと思う。
