@@ -34,6 +34,12 @@ class RouteMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         }
 
+        foreach ($route as $name => $value) {
+            if (is_string($name)) {
+                $request = $request->withAttribute($name, $value);
+            }
+        }
+
         foreach ($params as $name => $value) {
             $request = $request->withAttribute($name, $value);
         }
