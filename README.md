@@ -126,6 +126,26 @@ return [
 
 ルートのハンドラ（`get` メソッドの第２引数）にはコントローラー名とアクション名からなる配列を指定します。コントローラー名は DI コンテナからコントローラーインスタンスを取り出す際のエントリ名です（典型的にはコントローラーのクラス名）。アクション名はコントローラーのメソッド名です。
 
+ルートのハンドラに文字列のインデックスが含まれる場合、リクエストの属性にそのままセットされます。
+
+```php
+// routes.php
+return [
+    'app.routes' => value(function(RouteCollector $r) {
+        $r->get('/', [HomeController::class, 'indexAction', 'attr' => 'val']);
+    }),
+];
+
+// HomeController.php
+class HomeController
+{
+    public function attrAction(ServerRequestInterface $request)
+    {
+        $attr = $request->getAttribute('attr'); // val
+    }
+}
+```
+
 ## アクションメソッドの引数
 
 コントローラーのアクションメソッドでは、引数の名前やタイプヒントに基いて下記から自動的に値やオブジェクトが注入されます。
