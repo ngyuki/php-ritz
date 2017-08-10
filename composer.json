@@ -2,27 +2,22 @@
     "name": "ngyuki/ritz",
     "type": "library",
     "license": "MIT",
+    "config": {
+        "platform": {
+            "php": "7.0.10"
+        }
+    },
     "require": {
+        "PHP": "^7.0.10",
         "zendframework/zend-diactoros": "^1.4",
         "zendframework/zend-stratigility": "^2.0",
         "nikic/fast-route": "^1.2",
         "php-di/php-di": "^5.4",
         "doctrine/cache": "^1.6"
     },
-    "require-dev": {
-        "zendframework/zend-session": "^2.7",
-        "zendframework/-zenddom": "^2.6",
-        "filp/whoops": "^2.1",
-        "franzl/whoops-middleware": "^0.5.0"
-    },
     "autoload": {
         "psr-4" : {
             "Ritz\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4" : {
-            "Ritz\\App\\": "app/"
         }
     }
 }

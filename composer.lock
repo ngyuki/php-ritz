@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5f2f8351ea9eacf5e255bcca20b6a62c",
-    "content-hash": "d55e6b750ded36384ff5f859cb53a714",
+    "content-hash": "2e6edf98f91789b2ede690616e2ba77b",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -36,20 +35,20 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
-            "time": "2017-02-14 19:40:03"
+            "time": "2017-02-14T19:40:03+00:00"
         },
         {
             "name": "doctrine/cache",
-            "version": "v1.6.1",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
+                "reference": "eb152c5100571c7a45470ff2a35095ab3f3b900b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
-                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/eb152c5100571c7a45470ff2a35095ab3f3b900b",
+                "reference": "eb152c5100571c7a45470ff2a35095ab3f3b900b",
                 "shasum": ""
             },
             "require": {
@@ -106,7 +105,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2016-10-29 11:16:17"
+            "time": "2017-07-22T12:49:21+00:00"
         },
         {
             "name": "http-interop/http-middleware",
@@ -158,7 +157,7 @@
                 "request",
                 "response"
             ],
-            "time": "2017-01-14 15:23:42"
+            "time": "2017-01-14T15:23:42+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -201,7 +200,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2017-01-19 11:35:12"
+            "time": "2017-01-19T11:35:12+00:00"
         },
         {
             "name": "php-di/invoker",
@@ -244,7 +243,7 @@
                 "invoke",
                 "invoker"
             ],
-            "time": "2016-07-14 13:09:58"
+            "time": "2016-07-14T13:09:58+00:00"
         },
         {
             "name": "php-di/php-di",
@@ -306,7 +305,7 @@
                 "dependency injection",
                 "di"
             ],
-            "time": "2017-04-11 19:42:20"
+            "time": "2017-04-11T19:42:20+00:00"
         },
         {
             "name": "php-di/phpdoc-reader",
@@ -343,7 +342,7 @@
                 "phpdoc",
                 "reflection"
             ],
-            "time": "2015-11-29 10:34:25"
+            "time": "2015-11-29T10:34:25+00:00"
         },
         {
             "name": "psr/container",
@@ -392,7 +391,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/http-message",
@@ -442,7 +441,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "zendframework/zend-diactoros",
@@ -494,7 +493,7 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2017-04-06 16:18:34"
+            "time": "2017-04-06T16:18:34+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -538,7 +537,7 @@
                 "escaper",
                 "zf2"
             ],
-            "time": "2016-06-30 19:48:38"
+            "time": "2016-06-30T19:48:38+00:00"
         },
         {
             "name": "zendframework/zend-stratigility",
@@ -592,371 +591,20 @@
                 "middleware",
                 "psr-7"
             ],
-            "time": "2017-01-25 19:16:16"
+            "time": "2017-01-25T19:16:16+00:00"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "filp/whoops",
-            "version": "2.1.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/filp/whoops.git",
-                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
-                "reference": "f2950be7da8b8d6c4e77821b6c9d486e36cdc4f3",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9 || ^7.0",
-                "psr/log": "^1.0.1"
-            },
-            "require-dev": {
-                "mockery/mockery": "0.9.*",
-                "phpunit/phpunit": "^4.8 || ^5.0",
-                "symfony/var-dumper": "^2.6 || ^3.0"
-            },
-            "suggest": {
-                "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
-                "whoops/soap": "Formats errors as SOAP responses"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Whoops\\": "src/Whoops/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Filipe Dobreira",
-                    "homepage": "https://github.com/filp",
-                    "role": "Developer"
-                }
-            ],
-            "description": "php error handling for cool kids",
-            "homepage": "https://filp.github.io/whoops/",
-            "keywords": [
-                "error",
-                "exception",
-                "handling",
-                "library",
-                "whoops",
-                "zf2"
-            ],
-            "time": "2017-03-07 09:04:45"
-        },
-        {
-            "name": "franzl/whoops-middleware",
-            "version": "0.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/franzliedke/whoops-middleware.git",
-                "reference": "b33d0adac275ce3f6a8834a9ffa7b4ff165ba126"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/franzliedke/whoops-middleware/zipball/b33d0adac275ce3f6a8834a9ffa7b4ff165ba126",
-                "reference": "b33d0adac275ce3f6a8834a9ffa7b4ff165ba126",
-                "shasum": ""
-            },
-            "require": {
-                "filp/whoops": "^1.1 || ^2.0",
-                "zendframework/zend-diactoros": "^1.1.0"
-            },
-            "require-dev": {
-                "http-interop/http-middleware": "^0.4.1",
-                "phpunit/phpunit": "5.0.*"
-            },
-            "suggest": {
-                "http-interop/http-middleware": "In case you want to use PSR 15 middleware"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Franzl\\Middleware\\Whoops\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "time": "2017-02-01 11:49:46"
-        },
-        {
-            "name": "psr/log",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for logging libraries",
-            "homepage": "https://github.com/php-fig/log",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "time": "2016-10-10 12:19:37"
-        },
-        {
-            "name": "zendframework/zend-dom",
-            "version": "2.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-dom.git",
-                "reference": "a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-dom/zipball/a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e",
-                "reference": "a9e145b2b52fe6de5a7a6b0ddb5c773c2c72d59e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5-dev",
-                    "dev-develop": "2.6-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Dom\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "provides tools for working with DOM documents and structures",
-            "homepage": "https://github.com/zendframework/zend-dom",
-            "keywords": [
-                "dom",
-                "zf2"
-            ],
-            "time": "2015-10-14 03:37:48"
-        },
-        {
-            "name": "zendframework/zend-eventmanager",
-            "version": "3.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-eventmanager.git",
-                "reference": "c3bce7b7d47c54040b9ae51bc55491c72513b75d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/c3bce7b7d47c54040b9ae51bc55491c72513b75d",
-                "reference": "c3bce7b7d47c54040b9ae51bc55491c72513b75d",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.6 || ^7.0"
-            },
-            "require-dev": {
-                "athletic/athletic": "^0.1",
-                "container-interop/container-interop": "^1.1.0",
-                "phpunit/phpunit": "^5.6",
-                "zendframework/zend-coding-standard": "~1.0.0",
-                "zendframework/zend-stdlib": "^2.7.3 || ^3.0"
-            },
-            "suggest": {
-                "container-interop/container-interop": "^1.1.0, to use the lazy listeners feature",
-                "zendframework/zend-stdlib": "^2.7.3 || ^3.0, to use the FilterChain feature"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.1-dev",
-                    "dev-develop": "3.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\EventManager\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Trigger and listen to events within a PHP application",
-            "homepage": "https://github.com/zendframework/zend-eventmanager",
-            "keywords": [
-                "event",
-                "eventmanager",
-                "events",
-                "zf2"
-            ],
-            "time": "2016-12-19 21:47:12"
-        },
-        {
-            "name": "zendframework/zend-session",
-            "version": "2.7.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-session.git",
-                "reference": "346e9709657b81a5d53d70ce754730a26d1f02f2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-session/zipball/346e9709657b81a5d53d70ce754730a26d1f02f2",
-                "reference": "346e9709657b81a5d53d70ce754730a26d1f02f2",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5 || ^7.0",
-                "zendframework/zend-eventmanager": "^2.6.2 || ^3.0",
-                "zendframework/zend-stdlib": "^2.7 || ^3.0"
-            },
-            "require-dev": {
-                "container-interop/container-interop": "^1.1",
-                "fabpot/php-cs-fixer": "1.7.*",
-                "mongodb/mongodb": "^1.0.1",
-                "phpunit/phpunit": "~4.0",
-                "zendframework/zend-cache": "^2.6.1",
-                "zendframework/zend-db": "^2.7",
-                "zendframework/zend-http": "^2.5.4",
-                "zendframework/zend-servicemanager": "^2.7.5 || ^3.0.3",
-                "zendframework/zend-validator": "^2.6"
-            },
-            "suggest": {
-                "mongodb/mongodb": "If you want to use the MongoDB session save handler",
-                "zendframework/zend-cache": "Zend\\Cache component",
-                "zendframework/zend-db": "Zend\\Db component",
-                "zendframework/zend-http": "Zend\\Http component",
-                "zendframework/zend-servicemanager": "Zend\\ServiceManager component",
-                "zendframework/zend-validator": "Zend\\Validator component"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.7-dev",
-                    "dev-develop": "2.8-dev"
-                },
-                "zf": {
-                    "component": "Zend\\Session",
-                    "config-provider": "Zend\\Session\\ConfigProvider"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Session\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "manage and preserve session data, a logical complement of cookie data, across multiple page requests by the same client",
-            "homepage": "https://github.com/zendframework/zend-session",
-            "keywords": [
-                "session",
-                "zf2"
-            ],
-            "time": "2016-07-05 18:32:50"
-        },
-        {
-            "name": "zendframework/zend-stdlib",
-            "version": "3.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-stdlib.git",
-                "reference": "debedcfc373a293f9250cc9aa03cf121428c8e78"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/debedcfc373a293f9250cc9aa03cf121428c8e78",
-                "reference": "debedcfc373a293f9250cc9aa03cf121428c8e78",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.6 || ^7.0"
-            },
-            "require-dev": {
-                "athletic/athletic": "~0.1",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "^2.6.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.1-dev",
-                    "dev-develop": "3.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Stdlib\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "homepage": "https://github.com/zendframework/zend-stdlib",
-            "keywords": [
-                "stdlib",
-                "zf2"
-            ],
-            "time": "2016-09-13 14:38:50"
-        }
-    ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": []
+    "platform": {
+        "php": "^7.0.10"
+    },
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "7.0.10"
+    }
 }
