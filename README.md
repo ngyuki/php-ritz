@@ -28,11 +28,17 @@
 
 ## サンプルアプリ
 
-次のコマンドでサンプルアプリが実行できます。
+下記にサンプルアプリがあります。
+
+- https://github.com/ngyuki/php-ritz-app
+
+次のようにサンプルアプリが実行できます。
 
 ```sh
-conposer install
-php -S 0.0.0.0:8888
+git clone https://github.com/ngyuki/php-ritz-app.git
+cd php-ritz-app
+composer install
+php -S 0.0.0.0:8888 -t public/
 open http://localhost:8888/
 ```
 
@@ -54,8 +60,8 @@ open http://localhost:8888/
     - サーバのドキュメントルートに設定するディレクトリ
 - resource/
     - ビューのテンプレートファイルなどを格納するディレクトリ
-- tests/App/
-    - アプリケーションのテストコード
+- tests/
+    - サンプルアプリのテストコード
 
 ### ネームスペース構造
 
