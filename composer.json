@@ -19,5 +19,8 @@
         "psr-4" : {
             "Ritz\\": "src/"
         }
+    },
+    "require-dev": {
+        "ngyuki/phpunit-functions": "^1.0"
     }
 }
