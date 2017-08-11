@@ -5,7 +5,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use Zend\Stratigility\MiddlewarePipe;
 use Ritz\Dispatcher\ActionInvoker;
 use Ritz\Router\RouteResult;
 
@@ -36,14 +35,7 @@ class DispatchMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         }
 
-        $action = function (ServerRequestInterface $request, DelegateInterface $delegate) use ($instance, $method) {
-            $response = $this->invoker->invoke($request, $delegate, $instance, $method);
-            return $response;
-        };
-
-        $pipeline = new MiddlewarePipe();
-        $pipeline->pipe($action);
-
-        return $pipeline->process($request, $delegate);
+        $response = $this->invoker->invoke($request, $delegate, $instance, $method);
+        return $response;
     }
 }
