@@ -11,9 +11,9 @@ use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\SapiEmitter;
 
-use Zend\Stratigility\Delegate\CallableDelegateDecorator;
 use Zend\Stratigility\MiddlewarePipe;
 use Zend\Stratigility\Middleware\NotFoundHandler;
+use Zend\Stratigility\NoopFinalHandler;
 
 class Server
 {
@@ -32,16 +32,8 @@ class Server
 
     public function run(MiddlewareInterface $app)
     {
-        $pipeline = new MiddlewarePipe();
-
-        $pipeline->pipe($this->protocolVersionMiddleware());
-        $pipeline->pipe($this->directOutputHandlerMiddleware());
-
-        $pipeline->pipe($app);
-
         $request = ServerRequestFactory::fromGlobals();
-
-        $response = $this->handle($pipeline, $request);
+        $response = $this->handle($app, $request);
 
         $this->emitter->emit($response);
     }
@@ -53,12 +45,14 @@ class Server
      */
     public function handle(MiddlewareInterface $app, ServerRequestInterface $request)
     {
-        return $app->process($request, new CallableDelegateDecorator(
-            function (ServerRequestInterface $request, ResponseInterface $response) {
-                return (new NotFoundHandler($response))($request, $response, function () {});
-            },
-            new Response()
-        ));
+        $pipeline = new MiddlewarePipe();
+
+        $pipeline->pipe($this->protocolVersionMiddleware());
+        $pipeline->pipe($this->outputBufferingHandlerMiddleware());
+        $pipeline->pipe($app);
+        $pipeline->pipe(new NotFoundHandler(new Response()));
+
+        return $pipeline($request, new Response(), new NoopFinalHandler());
     }
 
     /**
@@ -72,7 +66,7 @@ class Server
      *
      * @return \Closure
      */
-    private function directOutputHandlerMiddleware()
+    private function outputBufferingHandlerMiddleware()
     {
         return function (ServerRequestInterface $request, DelegateInterface $delegate) {
             ob_start();

@@ -67,6 +67,8 @@ class ServerTest extends TestCase
         $server = new Server($this->createEmitter());
         $server->run($app);
 
+        assertEquals('', $this->response->getBody()->getContents());
+
         $this->expectOutputString('');
     }
 }
