@@ -8,6 +8,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\SapiEmitter;
 
 use Zend\Stratigility\Delegate\CallableDelegateDecorator;
@@ -16,6 +17,19 @@ use Zend\Stratigility\Middleware\NotFoundHandler;
 
 class Server
 {
+    /**
+     * @var EmitterInterface
+     */
+    private $emitter;
+
+    public function __construct(EmitterInterface $emitter = null)
+    {
+        if ($emitter === null) {
+            $emitter = new SapiEmitter();
+        }
+        $this->emitter = $emitter;
+    }
+
     public function run(MiddlewareInterface $app)
     {
         $pipeline = new MiddlewarePipe();
@@ -29,8 +43,7 @@ class Server
 
         $response = $this->handle($pipeline, $request);
 
-        $emitter = new SapiEmitter();
-        $emitter->emit($response);
+        $this->emitter->emit($response);
     }
 
     /**
@@ -66,7 +79,7 @@ class Server
             try {
                 $response = $delegate->process($request);
             } finally {
-                ob_clean();
+                ob_end_clean();
             }
             return $response;
         };
