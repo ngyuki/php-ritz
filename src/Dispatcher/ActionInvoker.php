@@ -22,18 +22,33 @@ class ActionInvoker
 
     public function __construct(ContainerInterface $container)
     {
-        if ($container instanceof InteropContainerInterface) {
-            $chain = [
-                new TypeHintResolver(),
-                new TypeHintContainerResolver($container),
-                new AssociativeArrayResolver(),
-            ];
-        } else {
-            $chain = [
-                new TypeHintResolver(),
-                new AssociativeArrayResolver(),
-            ];
+        if (!$container instanceof InteropContainerInterface) {
+            $container = new class($container) implements InteropContainerInterface
+            {
+                public $container;
+
+                public function __construct(ContainerInterface $container)
+                {
+                    $this->container = $container;
+                }
+
+                public function get($id)
+                {
+                    return $this->container->get($id);
+                }
+
+                public function has($id)
+                {
+                    return $this->container->has($id);
+                }
+            };
         }
+
+        $chain = [
+            new TypeHintResolver(),
+            new TypeHintContainerResolver($container),
+            new AssociativeArrayResolver(),
+        ];
 
         $this->internalInvoker = new Invoker(new ResolverChain($chain));
     }
