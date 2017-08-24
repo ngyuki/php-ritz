@@ -34,9 +34,13 @@ class RouteMiddleware implements MiddlewareInterface
             return $delegate->process($request);
         }
 
+        $handler = [];
+
         foreach ($route as $name => $value) {
             if (is_string($name)) {
                 $request = $request->withAttribute($name, $value);
+            } else {
+                $handler[] = $value;
             }
         }
 
@@ -44,8 +48,22 @@ class RouteMiddleware implements MiddlewareInterface
             $request = $request->withAttribute($name, $value);
         }
 
-        list ($class, $method) = $route;
-        $instance = $this->container->get($class);
+        if (count($handler) === 0) {
+            return $delegate->process($request);
+        }
+
+        $instance = $handler[0];
+
+        if (is_string($instance)) {
+            $instance = $this->container->get($instance);
+        }
+
+        $method = null;
+
+        if (count($handler) > 1) {
+            $method = $handler[1];
+        }
+
         $result = new RouteResult($instance, $method);
         $request = $request->withAttribute(RouteResult::class, $result);
 

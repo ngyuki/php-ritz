@@ -62,7 +62,11 @@ class ActionInvoker
 
         $parameters += $request->getAttributes();
 
-        $response = $this->internalInvoker->call([$instance, $method], $parameters);
+        if ($method === null) {
+            $response = $this->internalInvoker->call($instance, $parameters);
+        } else {
+            $response = $this->internalInvoker->call([$instance, $method], $parameters);
+        }
 
         if (is_array($response)) {
             return new ViewModel($response);
