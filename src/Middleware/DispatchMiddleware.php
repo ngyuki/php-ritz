@@ -11,12 +11,18 @@ use Ritz\Router\RouteResult;
 class DispatchMiddleware implements MiddlewareInterface
 {
     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
      * @var ActionInvoker
      */
     private $invoker;
 
     public function __construct(ContainerInterface $container, ActionInvoker $invoker)
     {
+        $this->container = $container;
         $this->invoker = $invoker;
     }
 
@@ -30,6 +36,10 @@ class DispatchMiddleware implements MiddlewareInterface
 
         $instance = $result->getInstance();
         $method = $result->getMethod();
+
+        if (is_string($instance)) {
+            $instance = $this->container->get($instance);
+        }
 
         if ($instance === null) {
             return $delegate->process($request);

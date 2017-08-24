@@ -1,7 +1,6 @@
 <?php
 namespace Ritz\Middleware;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
@@ -15,15 +14,9 @@ class RouteMiddleware implements MiddlewareInterface
      */
     private $router;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(Router $router, ContainerInterface $container)
+    public function __construct(Router $router)
     {
         $this->router = $router;
-        $this->container = $container;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
@@ -53,10 +46,6 @@ class RouteMiddleware implements MiddlewareInterface
         }
 
         $instance = $handler[0];
-
-        if (is_string($instance)) {
-            $instance = $this->container->get($instance);
-        }
 
         $method = null;
 

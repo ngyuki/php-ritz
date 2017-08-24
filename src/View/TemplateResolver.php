@@ -48,25 +48,40 @@ class TemplateResolver
         $result = RouteResult::from($request);
 
         if ($result === null) {
-            throw new \LogicException("No default template");
+            throw new \LogicException("No default template ... route result is null");
         }
 
-        $instance = $result->getInstance();
+        $class = $result->getInstance();
 
-        if ($instance === null) {
-            throw new \LogicException("No default template");
+        if ($class === null) {
+            throw new \LogicException("No default template ... instance is null");
         }
 
-        $class = get_class($instance);
-        $method = $result->getMethod();
+        if (is_object($class)) {
+            if ($class instanceof \Closure) {
+                throw new \LogicException("No default template ... instance is closure");
+            }
+            $class = get_class($class);
+        }
+
+        if (is_string($class) === false) {
+            throw new \LogicException("No default template ... instance is not string");
+        }
 
         $class = $this->applyClassMap($class);
 
         $class = preg_replace('/Controller$/', '', $class);
         $class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
-        $action = preg_replace('/Action$/', '', $method);
 
-        $template = "$class/$action";
+        $template = $class;
+
+        $method = $result->getMethod();
+
+        if ($method !== null) {
+            $action = preg_replace('/Action$/', '', $method);
+            $template .= '/' . $action;
+        }
+        
         return $template;
     }
 
