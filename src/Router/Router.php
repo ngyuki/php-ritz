@@ -12,10 +12,9 @@ class Router
      */
     private $dispatcher;
 
-    public function __construct(callable $callback, $cacheDir)
+    public function __construct(callable $callback, $cacheFile)
     {
-        if ($cacheDir !== null) {
-            $cacheFile = "$cacheDir/routes.php";
+        if ($cacheFile !== null) {
             $this->dispatcher = cachedDispatcher($callback, ['cacheFile' => $cacheFile]);
         } else {
             $this->dispatcher = simpleDispatcher($callback);
