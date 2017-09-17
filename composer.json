@@ -22,5 +22,17 @@
     },
     "require-dev": {
         "ngyuki/phpunit-functions": "^1.0"
+    },
+    "scripts": {
+        "phpunit": [
+            "phpunit --colors=always"
+        ],
+        "phan": [
+            "phan -p --color"
+        ],
+        "qa": [
+            "@phpunit",
+            "@phan"
+        ]
     }
 }
