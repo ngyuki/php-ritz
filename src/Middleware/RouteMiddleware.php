@@ -4,45 +4,37 @@ namespace Ritz\Middleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use Ritz\Router\Router;
+use Ritz\Router\RouterInterface;
 use Ritz\Router\RouteResult;
 
 class RouteMiddleware implements MiddlewareInterface
 {
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
-    public function __construct(Router $router)
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
     public function process(ServerRequestInterface $request, DelegateInterface $delegate)
     {
-        list ($route, $params) = $this->router->route($request->getMethod(), $request->getUri()->getPath());
+        $route = $this->router->route($request->getMethod(), $request->getUri()->getPath());
 
         if ($route === null) {
             return $delegate->process($request);
         }
 
-        $handler = [];
+        list ($handler, $params) = $route;
 
-        foreach ($route as $name => $value) {
-            if (is_string($name)) {
-                $request = $request->withAttribute($name, $value);
-            } else {
-                $handler[] = $value;
-            }
+        if (count($handler) === 0) {
+            return $delegate->process($request);
         }
 
         foreach ($params as $name => $value) {
             $request = $request->withAttribute($name, $value);
-        }
-
-        if (count($handler) === 0) {
-            return $delegate->process($request);
         }
 
         $instance = $handler[0];
