@@ -4,7 +4,7 @@ namespace Ritz\View;
 class PhpRenderer implements RendererInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $layout = null;
 
@@ -32,7 +32,8 @@ class PhpRenderer implements RendererInterface
             $content = (function(){
                 ob_start();
                 try {
-                    extract(func_get_arg(1));
+                    $params = func_get_arg(1);
+                    extract($params);
                     /** @noinspection PhpIncludeInspection */
                     include func_get_arg(0);
                     return ob_get_contents();
