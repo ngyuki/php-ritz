@@ -51,7 +51,7 @@ class DispatchMiddlewareTest extends TestCase
         $delegate = $this->createDelegate();
 
         $request = ServerRequestFactory::fromGlobals();
-        $request = $request->withAttribute(RouteResult::class, new RouteResult(null, 'xxx'));
+        $request = $request->withAttribute(RouteResult::class, new RouteResult(404, null, 'xxx', []));
         $response = $middleware->process($request, $delegate);
 
         assertEquals(404, $response->getStatusCode());
@@ -69,7 +69,7 @@ class DispatchMiddlewareTest extends TestCase
         $instance->method('action')->willReturn((new Response())->withStatus(201));
 
         $request = ServerRequestFactory::fromGlobals();
-        $request = $request->withAttribute(RouteResult::class, new RouteResult($instance, 'action'));
+        $request = $request->withAttribute(RouteResult::class, new RouteResult(200, $instance, 'action', []));
         $response = $middleware->process($request, $delegate);
 
         assertEquals(201, $response->getStatusCode());

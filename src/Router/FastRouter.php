@@ -63,12 +63,16 @@ class FastRouter implements RouterInterface
     /**
      * {@inheritdoc}
      */
-    public function route($method, $uri)
+    public function route($httpMethod, $uri)
     {
-        $routeInfo = $this->dispatcher->dispatch($method, $uri);
+        $routeInfo = $this->dispatcher->dispatch($httpMethod, $uri);
 
-        if ($routeInfo[0] != Dispatcher::FOUND) {
-            return null;
+        if ($routeInfo[0] == Dispatcher::NOT_FOUND) {
+            return new RouteResult(404, null, null, []);
+        }
+
+        if ($routeInfo[0] == Dispatcher::METHOD_NOT_ALLOWED) {
+            return new RouteResult(405, null, null, []);
         }
 
         $handler = [];
@@ -82,6 +86,19 @@ class FastRouter implements RouterInterface
             }
         }
 
-        return [$handler, $params];
+        if (count($handler) === 0) {
+            return new RouteResult(500, null, null, []);
+        }
+
+        $handler = array_values($handler);
+        $instance = $handler[0];
+        $method = null;
+
+        if (count($handler) > 1) {
+            $method = $handler[1];
+        }
+
+        $result = new RouteResult(200, $instance, $method, $params);
+        return $result;
     }
 }

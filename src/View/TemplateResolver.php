@@ -45,13 +45,13 @@ class TemplateResolver
      */
     private function getDefaultTemplate(ServerRequestInterface $request)
     {
-        $result = RouteResult::from($request);
+        $route = $request->getAttribute(RouteResult::class);
 
-        if ($result === null) {
+        if ($route === null) {
             throw new \LogicException("No default template ... route result is null");
         }
 
-        $class = $result->getInstance();
+        $class = $route->getInstance();
 
         if ($class === null) {
             throw new \LogicException("No default template ... instance is null");
@@ -75,7 +75,7 @@ class TemplateResolver
 
         $template = $class;
 
-        $method = $result->getMethod();
+        $method = $route->getMethod();
 
         if ($method !== null) {
             $action = preg_replace('/Action$/', '', $method);

@@ -1,28 +1,48 @@
 <?php
 namespace Ritz\Router;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 class RouteResult
 {
     /**
-     * @var object
+     * @var int
+     */
+    private $status;
+
+    /**
+     * @var object|null
      */
     private $instance;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $method;
 
     /**
-     * @param object $instance
-     * @param string $method
+     * @var array
      */
-    public function __construct($instance, $method)
+    private $params;
+
+    /**
+     * @param int $status
+     * @param object|null $instance
+     * @param string|null $method
+     * @param array $params
+     */
+    public function __construct($status, $instance, $method, array $params)
     {
+        $this->status = $status;
         $this->instance = $instance;
         $this->method = $method;
+        $this->params = $params;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     /**
@@ -42,11 +62,10 @@ class RouteResult
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return self
+     * @return array
      */
-    public static function from(ServerRequestInterface $request)
+    public function getParams()
     {
-        return $request->getAttribute(self::class);
+        return $this->params;
     }
 }
