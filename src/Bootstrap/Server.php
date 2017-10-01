@@ -5,15 +5,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
-
+use Ritz\Delegate\FinalDelegate;
 use Zend\Diactoros\ServerRequestFactory;
-use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\SapiEmitter;
-
 use Zend\Stratigility\MiddlewarePipe;
-use Zend\Stratigility\Middleware\NotFoundHandler;
-use Zend\Stratigility\NoopFinalHandler;
 
 class Server
 {
@@ -50,9 +46,8 @@ class Server
         $pipeline->pipe($this->protocolVersionMiddleware());
         $pipeline->pipe($this->outputBufferingHandlerMiddleware());
         $pipeline->pipe($app);
-        $pipeline->pipe(new NotFoundHandler(new Response()));
 
-        return $pipeline($request, new Response(), new NoopFinalHandler());
+        return $pipeline->process($request, new FinalDelegate());
     }
 
     /**

@@ -3,9 +3,9 @@ namespace Ritz\Test\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use DI\ContainerBuilder;
+use Ritz\Delegate\FinalDelegate;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response;
-use Zend\Stratigility\Delegate\CallableDelegateDecorator;
 use Ritz\Middleware\DispatchMiddleware;
 use Ritz\Dispatcher\ActionInvoker;
 use Ritz\Router\RouteResult;
@@ -19,25 +19,15 @@ class DispatchMiddlewareTest extends TestCase
         return $middleware;
     }
 
-    private function createDelegate()
-    {
-        $delegate = new CallableDelegateDecorator(
-            function () { return (new Response())->withStatus(404); },
-            new Response()
-        );
-        return $delegate;
-    }
-
     /**
      * @test
      */
     function has_not_route_result()
     {
         $middleware = $this->createMiddleware();
-        $delegate = $this->createDelegate();
 
         $request = ServerRequestFactory::fromGlobals();
-        $response = $middleware->process($request, $delegate);
+        $response = $middleware->process($request, new FinalDelegate());
 
         assertEquals(404, $response->getStatusCode());
     }
@@ -48,13 +38,12 @@ class DispatchMiddlewareTest extends TestCase
     function has_not_instance()
     {
         $middleware = $this->createMiddleware();
-        $delegate = $this->createDelegate();
 
         $request = ServerRequestFactory::fromGlobals();
-        $request = $request->withAttribute(RouteResult::class, new RouteResult(404, null, 'xxx', []));
-        $response = $middleware->process($request, $delegate);
+        $request = $request->withAttribute(RouteResult::class, new RouteResult(405, null, 'xxx', []));
+        $response = $middleware->process($request, new FinalDelegate());
 
-        assertEquals(404, $response->getStatusCode());
+        assertEquals(405, $response->getStatusCode());
     }
 
     /**
@@ -63,14 +52,13 @@ class DispatchMiddlewareTest extends TestCase
     function has_instance()
     {
         $middleware = $this->createMiddleware();
-        $delegate = $this->createDelegate();
 
         $instance = $this->getMockBuilder(\stdClass::class)->setMethods(['action'])->getMock();
         $instance->method('action')->willReturn((new Response())->withStatus(201));
 
         $request = ServerRequestFactory::fromGlobals();
         $request = $request->withAttribute(RouteResult::class, new RouteResult(200, $instance, 'action', []));
-        $response = $middleware->process($request, $delegate);
+        $response = $middleware->process($request, new FinalDelegate());
 
         assertEquals(201, $response->getStatusCode());
     }
