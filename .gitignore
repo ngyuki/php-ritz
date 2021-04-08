@@ -1,6 +1,4 @@
 /vendor/
 /phpunit.xml
 /.phpunit.result.cache
-/build/
-/app
-/.envrc
+/.psalm/

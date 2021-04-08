@@ -25,7 +25,8 @@
     },
     "require-dev": {
         "ngyuki/phpunit-functions": "^1.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "psalm/phar": "^4.7"
     },
     "autoload": {
         "psr-4" : {
@@ -41,12 +42,12 @@
         "phpunit": [
             "phpunit --colors=always"
         ],
-        "phan": [
-            "phan -p --color"
+        "psalm": [
+            "psalm.phar"
         ],
         "qa": [
             "@phpunit",
-            "@phan"
+            "@psalm"
         ]
     }
 }
