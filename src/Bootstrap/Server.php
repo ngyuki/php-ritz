@@ -67,11 +67,10 @@ class Server
         return new CallableMiddlewareDecorator(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
             ob_start();
             try {
-                $response = $handler->handle($request);
+                return $handler->handle($request);
             } finally {
                 ob_end_clean();
             }
-            return $response;
         });
     }
 

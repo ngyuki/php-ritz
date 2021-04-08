@@ -340,10 +340,16 @@ return [
     'directory_list' => [
         'src',
         'vendor/doctrine/cache/lib/Doctrine/Common/Cache',
+        'vendor/laminas/laminas-diactoros/src',
+        'vendor/laminas/laminas-httphandlerrunner/src',
+        'vendor/laminas/laminas-stratigility/src',
         'vendor/nikic/fast-route/src',
+        'vendor/php-di/invoker/src',
         'vendor/php-di/php-di/src',
-        'vendor/zendframework/zend-diactoros/src',
-        'vendor/zendframework/zend-stratigility/src',
+        'vendor/psr/container/src',
+        'vendor/psr/http-message/src',
+        'vendor/psr/http-server-handler/src',
+        'vendor/psr/http-server-middleware/src',
     ],
 
     // A list of individual files to include in analysis
