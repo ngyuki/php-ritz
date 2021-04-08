@@ -1,9 +1,10 @@
 <?php
 namespace Ritz\Middleware;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\Router\RouterInterface;
 use Ritz\Router\RouteResult;
 
@@ -19,12 +20,12 @@ class RouteMiddleware implements MiddlewareInterface
         $this->router = $router;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $route = $this->router->route($request->getMethod(), $request->getUri()->getPath());
 
         if ($route === null) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
         foreach ($route->getParams() as $name => $value) {
@@ -33,6 +34,6 @@ class RouteMiddleware implements MiddlewareInterface
 
         $request = $request->withAttribute(RouteResult::class, $route);
 
-        return $delegate->process($request);
+        return $handler->handle($request);
     }
 }

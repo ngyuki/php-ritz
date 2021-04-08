@@ -1,16 +1,15 @@
 <?php
 namespace Ritz\Dispatcher;
 
+use Laminas\Diactoros\Response\TextResponse;
 use Psr\Container\ContainerInterface;
-use Interop\Container\ContainerInterface as InteropContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
 use Invoker\Invoker;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
 use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use Invoker\ParameterResolver\TypeHintResolver;
-use Zend\Diactoros\Response\TextResponse;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\View\ViewModel;
 
 class ActionInvoker
@@ -22,28 +21,6 @@ class ActionInvoker
 
     public function __construct(ContainerInterface $container)
     {
-        if (!$container instanceof InteropContainerInterface) {
-            $container = new class($container) implements InteropContainerInterface
-            {
-                public $container;
-
-                public function __construct(ContainerInterface $container)
-                {
-                    $this->container = $container;
-                }
-
-                public function get($id)
-                {
-                    return $this->container->get($id);
-                }
-
-                public function has($id)
-                {
-                    return $this->container->has($id);
-                }
-            };
-        }
-
         $chain = [
             new TypeHintResolver(),
             new TypeHintContainerResolver($container),
@@ -53,11 +30,11 @@ class ActionInvoker
         $this->internalInvoker = new Invoker(new ResolverChain($chain));
     }
 
-    public function invoke(ServerRequestInterface $request, DelegateInterface $delegate, $instance, $method)
+    public function invoke(ServerRequestInterface $request, RequestHandlerInterface $handler, $instance, $method)
     {
         $parameters = [
             ServerRequestInterface::class => $request,
-            DelegateInterface::class => $delegate,
+            RequestHandlerInterface::class => $handler,
         ];
 
         $parameters += $request->getAttributes();

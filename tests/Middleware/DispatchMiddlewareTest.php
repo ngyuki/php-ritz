@@ -3,7 +3,7 @@ namespace Ritz\Test\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use DI\ContainerBuilder;
-use Ritz\Delegate\FinalDelegate;
+use Ritz\RequestHandler\FinalDelegate;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response;
 use Ritz\Middleware\DispatchMiddleware;

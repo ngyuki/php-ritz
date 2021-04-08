@@ -2,9 +2,10 @@
 namespace Ritz\Middleware;
 
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\Dispatcher\ActionInvoker;
 use Ritz\Router\RouteResult;
 
@@ -26,12 +27,12 @@ class DispatchMiddleware implements MiddlewareInterface
         $this->invoker = $invoker;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $route = $request->getAttribute(RouteResult::class);
 
         if ($route === null) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
         $instance = $route->getInstance();
@@ -42,10 +43,10 @@ class DispatchMiddleware implements MiddlewareInterface
         }
 
         if ($instance === null) {
-            return $delegate->process($request);
+            return $handler->handle($request);
         }
 
-        $response = $this->invoker->invoke($request, $delegate, $instance, $method);
+        $response = $this->invoker->invoke($request, $handler, $instance, $method);
         return $response;
     }
 }

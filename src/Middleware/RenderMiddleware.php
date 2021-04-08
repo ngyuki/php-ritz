@@ -1,9 +1,10 @@
 <?php
 namespace Ritz\Middleware;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\View\RendererInterface;
 use Ritz\View\TemplateResolver;
 use Ritz\View\ViewModel;
@@ -26,9 +27,9 @@ class RenderMiddleware implements MiddlewareInterface
         $this->resolver = $resolver;
     }
 
-    public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = $delegate->process($request);
+        $response = $handler->handle($request);
 
         if ($response instanceof ViewModel) {
             $template = $this->resolver->resolve($request, $response);

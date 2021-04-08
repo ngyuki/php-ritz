@@ -1,14 +1,15 @@
 <?php
-namespace Ritz\Delegate;
+namespace Ritz\RequestHandler;
 
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use Laminas\Diactoros\Response;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\Router\RouteResult;
-use Zend\Diactoros\Response;
 
-class FinalDelegate implements DelegateInterface
+class FinalRequestHandler implements RequestHandlerInterface
 {
-    public function process(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $status = 404;
         $route = $request->getAttribute(RouteResult::class);
@@ -25,5 +26,4 @@ class FinalDelegate implements DelegateInterface
         ));
         return $response;
     }
-
 }

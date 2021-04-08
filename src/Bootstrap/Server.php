@@ -1,15 +1,16 @@
 <?php
 namespace Ritz\Bootstrap;
 
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Laminas\Stratigility\Middleware\CallableMiddlewareDecorator;
+use Laminas\Stratigility\MiddlewarePipe;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Ritz\Delegate\FinalDelegate;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\Diactoros\Response\EmitterInterface;
-use Zend\Diactoros\Response\SapiEmitter;
-use Zend\Stratigility\MiddlewarePipe;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Ritz\RequestHandler\FinalRequestHandler;
 
 class Server
 {
@@ -39,7 +40,7 @@ class Server
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function handle(MiddlewareInterface $app, ServerRequestInterface $request)
+    public function handle(MiddlewareInterface $app, ServerRequestInterface $request): ResponseInterface
     {
         $pipeline = new MiddlewarePipe();
 
@@ -47,7 +48,7 @@ class Server
         $pipeline->pipe($this->outputBufferingHandlerMiddleware());
         $pipeline->pipe($app);
 
-        return $pipeline->process($request, new FinalDelegate());
+        return $pipeline->process($request, new FinalRequestHandler());
     }
 
     /**
@@ -59,32 +60,32 @@ class Server
      *
      * このミドルウェアは出力バッファリングを用いて直接出力を握りつぶす。
      *
-     * @return \Closure
+     * @return MiddlewareInterface
      */
-    private function outputBufferingHandlerMiddleware()
+    private function outputBufferingHandlerMiddleware(): MiddlewareInterface
     {
-        return function (ServerRequestInterface $request, DelegateInterface $delegate) {
+        return new CallableMiddlewareDecorator(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
             ob_start();
             try {
-                $response = $delegate->process($request);
+                $response = $handler->handle($request);
             } finally {
                 ob_end_clean();
             }
             return $response;
-        };
+        });
     }
 
     /**
      * リクエストのプロトコルバージョンを元にレスポンスのプロトコルバージョンを設定するミドルウェア
      *
-     * @return \Closure
+     * @return MiddlewareInterface
      */
-    private function protocolVersionMiddleware()
+    private function protocolVersionMiddleware(): MiddlewareInterface
     {
-        return function (ServerRequestInterface $request, DelegateInterface $delegate) {
-            $response = $delegate->process($request);
+        return new CallableMiddlewareDecorator(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
+            $response = $handler->handle($request);
             $response = $response->withProtocolVersion($request->getProtocolVersion());
             return $response;
-        };
+        });
     }
 }

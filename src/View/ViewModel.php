@@ -1,7 +1,7 @@
 <?php
 namespace Ritz\View;
 
-use Zend\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\HtmlResponse;
 
 class ViewModel extends HtmlResponse
 {
