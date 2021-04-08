@@ -1,13 +1,15 @@
 <?php
 namespace Ritz\Test\Bootstrap;
 
+use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Laminas\Stratigility\Middleware\CallableMiddlewareDecorator;
+use Laminas\Stratigility\MiddlewarePipe;
 use PHPUnit\Framework\TestCase;
-use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Stratigility\MiddlewarePipe;
-use Zend\Diactoros\Response\EmitterInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ritz\Bootstrap\Server;
+use function PHPUnit\Framework\assertEquals;
 
 class ServerTest extends TestCase
 {
@@ -21,6 +23,7 @@ class ServerTest extends TestCase
         $emitter = $this->createMock(EmitterInterface::class);
         $emitter->method('emit')->willReturnCallback(function ($response) {
             $this->response = $response;
+            return true;
         });
         return $emitter;
     }
@@ -59,10 +62,10 @@ class ServerTest extends TestCase
     function must_empty_output()
     {
         $app = new MiddlewarePipe();
-        $app->pipe(function (ServerRequestInterface $request, DelegateInterface $delegate) {
+        $app->pipe(new CallableMiddlewareDecorator(function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
             echo 'dummy';
-            return $delegate->process($request);
-        });
+            return $handler->handle($request);
+        }));
 
         $server = new Server($this->createEmitter());
         $server->run($app);

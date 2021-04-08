@@ -1,14 +1,15 @@
 <?php
 namespace Ritz\Test\Middleware;
 
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequestFactory;
 use PHPUnit\Framework\TestCase;
 use DI\ContainerBuilder;
-use Ritz\RequestHandler\FinalDelegate;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\Diactoros\Response;
 use Ritz\Middleware\DispatchMiddleware;
 use Ritz\Dispatcher\ActionInvoker;
+use Ritz\RequestHandler\FinalRequestHandler;
 use Ritz\Router\RouteResult;
+use function PHPUnit\Framework\assertEquals;
 
 class DispatchMiddlewareTest extends TestCase
 {
@@ -27,7 +28,7 @@ class DispatchMiddlewareTest extends TestCase
         $middleware = $this->createMiddleware();
 
         $request = ServerRequestFactory::fromGlobals();
-        $response = $middleware->process($request, new FinalDelegate());
+        $response = $middleware->process($request, new FinalRequestHandler());
 
         assertEquals(404, $response->getStatusCode());
     }
@@ -41,7 +42,7 @@ class DispatchMiddlewareTest extends TestCase
 
         $request = ServerRequestFactory::fromGlobals();
         $request = $request->withAttribute(RouteResult::class, new RouteResult(405, null, 'xxx', []));
-        $response = $middleware->process($request, new FinalDelegate());
+        $response = $middleware->process($request, new FinalRequestHandler());
 
         assertEquals(405, $response->getStatusCode());
     }
@@ -58,7 +59,7 @@ class DispatchMiddlewareTest extends TestCase
 
         $request = ServerRequestFactory::fromGlobals();
         $request = $request->withAttribute(RouteResult::class, new RouteResult(200, $instance, 'action', []));
-        $response = $middleware->process($request, new FinalDelegate());
+        $response = $middleware->process($request, new FinalRequestHandler());
 
         assertEquals(201, $response->getStatusCode());
     }

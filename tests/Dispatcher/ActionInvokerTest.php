@@ -1,23 +1,24 @@
 <?php
-namespace Ritz\Test\Bootstrap;
+namespace Ritz\Test\Dispatcher;
 
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequestFactory;
 use PHPUnit\Framework\TestCase;
 
-use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Interop\Container\ContainerInterface as InteropContainerInterface;
+use Psr\Container\ContainerInterface;
 use Invoker\Exception\NotEnoughParametersException;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\Stratigility\Delegate\CallableDelegateDecorator;
+use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
 use Ritz\Dispatcher\ActionInvoker;
+use function PHPUnit\Framework\assertSame;
 
 class ActionInvokerTest extends TestCase
 {
-    private function createPsrContainer(array $instances = [])
+    private function createContainer(array $instances = []): ContainerInterface
     {
-        return new class($instances) extends \ArrayObject implements PsrContainerInterface {
+        return new class($instances) extends \ArrayObject implements ContainerInterface {
 
             public function get($id)
             {
@@ -31,18 +32,12 @@ class ActionInvokerTest extends TestCase
         };
     }
 
-    private function createInteropContainer(array $instances = [])
+    private function createRequestHandler(): RequestHandlerInterface
     {
-        return new class($instances) extends \ArrayObject implements InteropContainerInterface {
-
-            public function get($id)
+        return new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                return $this[$id];
-            }
-
-            public function has($id)
-            {
-                return isset($this[$id]);
+                return new Response();
             }
         };
     }
@@ -54,9 +49,9 @@ class ActionInvokerTest extends TestCase
      */
     public function prefer_attr_over_name_and_container()
     {
-        $container = $this->createInteropContainer();
+        $container = $this->createContainer();
         $request = ServerRequestFactory::fromGlobals();
-        $delegate = new CallableDelegateDecorator(function(){}, new Response());
+        $handler = $this->createRequestHandler();
 
         $container[stdClass::class] = new stdClass();
         $container['xxx'] = new stdClass();
@@ -73,7 +68,7 @@ class ActionInvokerTest extends TestCase
         };
 
         $invoker = new ActionInvoker($container);
-        $invoker->invoke($request, $delegate, $instance, 'action');
+        $invoker->invoke($request, $handler, $instance, 'action');
 
         /* @var $request ServerRequestInterface */
         assertSame($instance->args, [$request->getAttribute(stdClass::class)]);
@@ -86,9 +81,9 @@ class ActionInvokerTest extends TestCase
      */
     public function prefer_container_over_name()
     {
-        $container = $this->createInteropContainer();
+        $container = $this->createContainer();
         $request = ServerRequestFactory::fromGlobals();
-        $delegate = new CallableDelegateDecorator(function(){}, new Response());
+        $handler = $this->createRequestHandler();
 
         $container[stdClass::class] = new stdClass();
         $container['xxx'] = new stdClass();
@@ -105,7 +100,7 @@ class ActionInvokerTest extends TestCase
         };
 
         $invoker = new ActionInvoker($container);
-        $invoker->invoke($request, $delegate, $instance, 'action');
+        $invoker->invoke($request, $handler, $instance, 'action');
 
         assertSame($instance->args, [$container[stdClass::class]]);
     }
@@ -118,9 +113,9 @@ class ActionInvokerTest extends TestCase
      */
     public function prefer_attr_over_container_in_name()
     {
-        $container = $this->createInteropContainer();
+        $container = $this->createContainer();
         $request = ServerRequestFactory::fromGlobals();
-        $delegate = new CallableDelegateDecorator(function(){}, new Response());
+        $handler = $this->createRequestHandler();
 
         //$container[stdClass::class] = new stdClass();
         $container['xxx'] = new stdClass();
@@ -137,7 +132,7 @@ class ActionInvokerTest extends TestCase
         };
 
         $invoker = new ActionInvoker($container);
-        $invoker->invoke($request, $delegate, $instance, 'action');
+        $invoker->invoke($request, $handler, $instance, 'action');
 
         assertSame($instance->args, [$request->getAttribute('xxx')]);
     }
@@ -148,9 +143,9 @@ class ActionInvokerTest extends TestCase
      */
     public function does_not_resolve_parameter_name_from_container()
     {
-        $container = $this->createInteropContainer();
+        $container = $this->createContainer();
         $request = ServerRequestFactory::fromGlobals();
-        $delegate = new CallableDelegateDecorator(function(){}, new Response());
+        $handler = $this->createRequestHandler();
 
         //$container[stdClass::class] = new stdClass();
         $container['xxx'] = new stdClass();
@@ -169,35 +164,6 @@ class ActionInvokerTest extends TestCase
         $this->expectException(NotEnoughParametersException::class);
 
         $invoker = new ActionInvoker($container);
-        $invoker->invoke($request, $delegate, $instance, 'action');
-    }
-
-    /**
-     * PSR コンテナインタフェースもサポートする
-     *
-     * PHP-DI/Invoker の 1.x が Interop しか対応していないけどアダプタで対応する
-     *
-     * @test
-     */
-    public function psr_container_support()
-    {
-        $container = $this->createPsrContainer();
-        $request = ServerRequestFactory::fromGlobals();
-        $delegate = new CallableDelegateDecorator(function(){}, new Response());
-
-        $container[stdClass::class] = new stdClass();
-        $request = $request->withAttribute('xxx', new stdClass());
-
-        $instance = new class {
-            public $args;
-            function action(stdClass $xxx)
-            {
-                $this->args = func_get_args();
-            }
-        };
-
-        $invoker = new ActionInvoker($container);
-        $invoker->invoke($request, $delegate, $instance, 'action');
-        assertSame($instance->args, [$container[stdClass::class]]);
+        $invoker->invoke($request, $handler, $instance, 'action');
     }
 }
