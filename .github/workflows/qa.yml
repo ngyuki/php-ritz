@@ -1,0 +1,71 @@
+name: qa
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.0"
+          - "8.1"
+          - "8.2"
+        dependencies:
+          - lowest
+          - highest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+
+      - uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ matrix.dependencies }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+            ${{ runner.os }}-php-
+
+      - uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+
+      - run: vendor/bin/phpunit --colors --coverage-text
+        env:
+          XDEBUG_MODE: coverage
+
+  psalm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dependencies:
+          - lowest
+          - highest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+
+      - uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ matrix.dependencies }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+            ${{ runner.os }}-php-
+
+      - uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+
+      - run: vendor/bin/psalm.phar
